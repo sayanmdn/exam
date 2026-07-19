@@ -1,0 +1,170 @@
+// Prisma schema for the Exam Portal (NEET/JEE-inspired online testing platform)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Direct (non-pooled) connection used by Prisma Migrate.
+  // Falls back to DATABASE_URL if DIRECT_URL is not set.
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js (NextAuth) models
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  phone         String?
+  role          String    @default("STUDENT") // STUDENT | ADMIN
+  createdAt     DateTime  @default(now())
+
+  accounts    Account[]
+  sessions    Session[]
+  enrollments Enrollment[]
+  attempts    Attempt[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------------------------------------------------------------------------
+// Domain models
+// ---------------------------------------------------------------------------
+
+model Classroom {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  enrollments Enrollment[]
+  categories  Category[]
+  exams       Exam[]
+}
+
+model Enrollment {
+  id          String   @id @default(cuid())
+  userId      String
+  classroomId String
+  status      String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  createdAt   DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classroomId])
+}
+
+model Category {
+  id          String @id @default(cuid())
+  name        String
+  classroomId String
+
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  exams     Exam[]
+}
+
+model Exam {
+  id              String   @id @default(cuid())
+  title           String
+  description     String?
+  categoryId      String?
+  durationMinutes Int      @default(60)
+  isPublished     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  // An exam can be made accessible in a set of classrooms (many-to-many).
+  classrooms Classroom[]
+  category   Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  questions  Question[]
+  attempts   Attempt[]
+}
+
+model Question {
+  id            String @id @default(cuid())
+  examId        String
+  text          String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctOption String // "A" | "B" | "C" | "D"
+  marks         Int    @default(4) // NEET/JEE: +4 for correct
+  negativeMarks Int    @default(1) // NEET/JEE: -1 for wrong
+  order         Int    @default(0)
+
+  exam    Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  answers Answer[]
+}
+
+model Attempt {
+  id             String    @id @default(cuid())
+  userId         String
+  examId         String
+  startedAt      DateTime  @default(now())
+  submittedAt    DateTime?
+  score          Float     @default(0)
+  totalMarks     Float     @default(0)
+  correctCount   Int       @default(0)
+  totalQuestions Int       @default(0)
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exam    Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@index([userId])
+  @@index([examId])
+}
+
+model Answer {
+  id             String  @id @default(cuid())
+  attemptId      String
+  questionId     String
+  selectedOption String? // "A" | "B" | "C" | "D" | null (unanswered)
+
+  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+}

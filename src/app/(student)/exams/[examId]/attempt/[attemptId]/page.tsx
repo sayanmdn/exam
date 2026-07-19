@@ -1,0 +1,63 @@
+import { redirect } from "next/navigation";
+import { requireStudent } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
+import { ExamRunner } from "./exam-runner";
+
+export const metadata = { title: "Test in progress" };
+
+export default async function AttemptPage({
+  params,
+}: {
+  params: Promise<{ examId: string; attemptId: string }>;
+}) {
+  const user = await requireStudent();
+  const { examId, attemptId } = await params;
+
+  const attempt = await prisma.attempt.findUnique({
+    where: { id: attemptId },
+    include: {
+      exam: {
+        include: {
+          questions: { orderBy: { order: "asc" } },
+        },
+      },
+    },
+  });
+
+  // Guard: must exist, belong to this user, match the exam, and be unfinished.
+  if (!attempt || attempt.userId !== user.id || attempt.examId !== examId) {
+    redirect("/exams");
+  }
+  if (attempt.submittedAt) {
+    redirect(`/results/${attempt.id}`);
+  }
+
+  const durationMs = attempt.exam.durationMinutes * 60 * 1000;
+  const deadline = attempt.startedAt.getTime() + durationMs;
+  const secondsRemaining = Math.max(
+    0,
+    Math.floor((deadline - Date.now()) / 1000),
+  );
+
+  // Never send correct answers to the client.
+  const questions = attempt.exam.questions.map((q) => ({
+    id: q.id,
+    text: q.text,
+    optionA: q.optionA,
+    optionB: q.optionB,
+    optionC: q.optionC,
+    optionD: q.optionD,
+    marks: q.marks,
+    negativeMarks: q.negativeMarks,
+  }));
+
+  return (
+    <ExamRunner
+      attemptId={attempt.id}
+      examId={examId}
+      examTitle={attempt.exam.title}
+      questions={questions}
+      secondsRemaining={secondsRemaining}
+    />
+  );
+}
