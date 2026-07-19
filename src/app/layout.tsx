@@ -41,6 +41,10 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+// Run serverless functions in Singapore to sit next to the Neon DB
+// (ap-southeast-1). Cuts cross-region DB latency, the main cause of slow loads.
+export const preferredRegion = "sin1";
+
 export default function RootLayout({
   children,
 }: Readonly<{
