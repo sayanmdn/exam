@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import {
   setEnrollmentStatus,
   approveStudent,
@@ -8,8 +10,26 @@ import {
 import { PageHeader, Badge, EmptyState } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 
-export default async function AdminStudentsPage() {
+export default async function AdminStudentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   await requireAdmin();
+  const { q } = await searchParams;
+  const query = (q ?? "").trim();
+
+  const studentWhere: Prisma.UserWhereInput = {
+    role: "STUDENT",
+    ...(query
+      ? {
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { email: { contains: query, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
 
   const [pendingStudents, classrooms, enrollments, allStudents] =
     await Promise.all([
@@ -24,7 +44,7 @@ export default async function AdminStudentsPage() {
         orderBy: [{ status: "asc" }, { createdAt: "desc" }],
       }),
       prisma.user.findMany({
-        where: { role: "STUDENT" },
+        where: studentWhere,
         include: { enrollments: { include: { classroom: true } } },
         orderBy: { createdAt: "desc" },
       }),
@@ -152,13 +172,42 @@ export default async function AdminStudentsPage() {
       )}
 
       {/* All students */}
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
-        All students
-      </h2>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+          All students
+        </h2>
+        <form method="get" className="flex gap-2">
+          <input
+            type="search"
+            name="q"
+            defaultValue={query}
+            placeholder="Search by name or email…"
+            className="w-56 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          />
+          <button
+            type="submit"
+            className="rounded-lg bg-brand-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-brand-700"
+          >
+            Search
+          </button>
+          {query && (
+            <Link
+              href="/admin/students"
+              className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            >
+              Clear
+            </Link>
+          )}
+        </form>
+      </div>
       {allStudents.length === 0 ? (
         <EmptyState
-          title="No students yet"
-          body="Students appear here after they sign in with Google."
+          title={query ? "No matching students" : "No students yet"}
+          body={
+            query
+              ? `No students match "${query}". Try a different search.`
+              : "Students appear here after they sign in with Google."
+          }
         />
       ) : (
         <div className="card overflow-hidden">
@@ -169,6 +218,7 @@ export default async function AdminStudentsPage() {
                   <th className="px-4 py-3">Student</th>
                   <th className="px-4 py-3">Account</th>
                   <th className="px-4 py-3">Classrooms</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -179,9 +229,12 @@ export default async function AdminStudentsPage() {
                   return (
                     <tr key={s.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
-                        <p className="font-medium text-gray-900">
+                        <Link
+                          href={`/admin/students/${s.id}`}
+                          className="font-medium text-gray-900 hover:text-brand-700 hover:underline"
+                        >
                           {s.name ?? "—"}
-                        </p>
+                        </Link>
                         <p className="text-xs text-gray-500">{s.email}</p>
                       </td>
                       <td className="px-4 py-3">
@@ -195,6 +248,14 @@ export default async function AdminStudentsPage() {
                           : approvedClassrooms
                               .map((en) => en.classroom.name)
                               .join(", ")}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Link
+                          href={`/admin/students/${s.id}`}
+                          className="text-xs font-medium text-brand-600 hover:underline"
+                        >
+                          Manage
+                        </Link>
                       </td>
                     </tr>
                   );

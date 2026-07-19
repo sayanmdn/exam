@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth-helpers";
 import { gradeAttempt } from "@/lib/grading";
+import { normalizeIndianPhone } from "@/lib/phone";
 
 export async function requestEnrollment(classroomId: string) {
   const user = await requireUser();
@@ -27,9 +28,13 @@ export async function requestEnrollment(classroomId: string) {
 export async function completeProfile(formData: FormData) {
   const user = await requireUser();
   const name = String(formData.get("name") ?? "").trim();
-  const phone = String(formData.get("phone") ?? "").trim();
+  const rawPhone = String(formData.get("phone") ?? "").trim();
   if (!name) throw new Error("Your name is required");
-  if (!phone) throw new Error("A phone number is required");
+  if (!rawPhone) throw new Error("A phone number is required");
+  const phone = normalizeIndianPhone(rawPhone);
+  if (!phone) {
+    throw new Error("Enter a valid 10-digit Indian mobile number");
+  }
 
   await prisma.user.update({
     where: { id: user.id },
@@ -42,13 +47,21 @@ export async function completeProfile(formData: FormData) {
 export async function updateProfile(formData: FormData) {
   const user = await requireUser();
   const name = String(formData.get("name") ?? "").trim();
-  const phone = String(formData.get("phone") ?? "").trim();
+  const rawPhone = String(formData.get("phone") ?? "").trim();
+
+  let phone: string | null = null;
+  if (rawPhone) {
+    phone = normalizeIndianPhone(rawPhone);
+    if (!phone) {
+      throw new Error("Enter a valid 10-digit Indian mobile number");
+    }
+  }
 
   await prisma.user.update({
     where: { id: user.id },
     data: {
       name: name || undefined,
-      phone: phone || null,
+      phone,
     },
   });
   revalidatePath("/profile");

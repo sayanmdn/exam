@@ -83,6 +83,63 @@ export async function rejectStudent(userId: string) {
   revalidatePath("/admin");
 }
 
+/**
+ * Sets a student's account status directly. `PENDING` sends an already-approved
+ * student back to "unverified" so they lose portal access until re-approved.
+ * Name, email and phone are never touched here — those stay owned by the student.
+ */
+export async function setStudentStatus(
+  studentId: string,
+  status: "APPROVED" | "REJECTED" | "PENDING",
+) {
+  await requireAdmin();
+  await prisma.user.update({
+    where: { id: studentId },
+    data: { status },
+  });
+  revalidatePath("/admin/students");
+  revalidatePath(`/admin/students/${studentId}`);
+  revalidatePath("/admin");
+}
+
+/**
+ * Replaces the set of classrooms a student is enrolled in. Checked classrooms
+ * become APPROVED enrollments; unchecked ones are removed. Teacher-driven only.
+ */
+export async function setStudentClassrooms(
+  studentId: string,
+  formData: FormData,
+) {
+  await requireAdmin();
+  const classroomIds = formData
+    .getAll("classroomIds")
+    .map((v) => String(v))
+    .filter(Boolean);
+
+  const all = await prisma.classroom.findMany({ select: { id: true } });
+
+  await prisma.$transaction(async (tx) => {
+    for (const c of all) {
+      if (classroomIds.includes(c.id)) {
+        await tx.enrollment.upsert({
+          where: {
+            userId_classroomId: { userId: studentId, classroomId: c.id },
+          },
+          update: { status: "APPROVED" },
+          create: { userId: studentId, classroomId: c.id, status: "APPROVED" },
+        });
+      } else {
+        await tx.enrollment.deleteMany({
+          where: { userId: studentId, classroomId: c.id },
+        });
+      }
+    }
+  });
+
+  revalidatePath(`/admin/students/${studentId}`);
+  revalidatePath("/admin/students");
+}
+
 // --------------------------------------------------------------------------
 // Enrollments (student approval)
 // --------------------------------------------------------------------------

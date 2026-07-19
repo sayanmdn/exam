@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { updateProfile } from "@/app/actions/student";
 import { PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
+import { INDIAN_PHONE_PATTERN, INDIAN_PHONE_TITLE } from "@/lib/phone";
 
 export default async function ProfilePage() {
   const sessionUser = await requireStudent();
@@ -79,6 +80,8 @@ export default async function ProfilePage() {
               <input
                 name="phone"
                 type="tel"
+                pattern={INDIAN_PHONE_PATTERN}
+                title={INDIAN_PHONE_TITLE}
                 defaultValue={user.phone ?? ""}
                 placeholder="+91 00000 00000"
                 className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"

@@ -6,6 +6,7 @@ import { completeProfile } from "@/app/actions/student";
 import { Logo } from "@/components/logo";
 import { SubmitButton } from "@/components/submit-button";
 import { SignOutButton } from "@/components/sign-out-button";
+import { INDIAN_PHONE_PATTERN, INDIAN_PHONE_TITLE } from "@/lib/phone";
 
 export const metadata: Metadata = {
   title: "Complete your profile",
@@ -83,6 +84,8 @@ export default async function OnboardingPage() {
                 name="phone"
                 type="tel"
                 required
+                pattern={INDIAN_PHONE_PATTERN}
+                title={INDIAN_PHONE_TITLE}
                 defaultValue={user.phone ?? ""}
                 placeholder="+91 00000 00000"
                 className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
@@ -96,7 +99,7 @@ export default async function OnboardingPage() {
               pendingText="Submitting…"
               className="w-full rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
             >
-              Submit for validation
+              Submit for verification
             </SubmitButton>
           </form>
         </div>
