@@ -37,6 +37,53 @@ export async function createCategory(formData: FormData) {
 }
 
 // --------------------------------------------------------------------------
+// Student validation (account-level teacher approval)
+// --------------------------------------------------------------------------
+
+/**
+ * Validates a student's account and, in the same step, enrolls them into the
+ * classroom(s) the teacher selected. Classroom mapping is teacher-driven:
+ * the student never picks their own classroom.
+ */
+export async function approveStudent(formData: FormData) {
+  await requireAdmin();
+  const userId = String(formData.get("userId") ?? "");
+  const classroomIds = formData
+    .getAll("classroomIds")
+    .map((v) => String(v))
+    .filter(Boolean);
+  if (!userId) throw new Error("Missing student");
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: userId },
+      data: { status: "APPROVED" },
+    });
+    for (const classroomId of classroomIds) {
+      await tx.enrollment.upsert({
+        where: { userId_classroomId: { userId, classroomId } },
+        update: { status: "APPROVED" },
+        create: { userId, classroomId, status: "APPROVED" },
+      });
+    }
+  });
+
+  revalidatePath("/admin/students");
+  revalidatePath("/admin");
+}
+
+/** Rejects a student's validation request. */
+export async function rejectStudent(userId: string) {
+  await requireAdmin();
+  await prisma.user.update({
+    where: { id: userId },
+    data: { status: "REJECTED" },
+  });
+  revalidatePath("/admin/students");
+  revalidatePath("/admin");
+}
+
+// --------------------------------------------------------------------------
 // Enrollments (student approval)
 // --------------------------------------------------------------------------
 

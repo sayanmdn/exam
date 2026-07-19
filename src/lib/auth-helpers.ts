@@ -27,7 +27,12 @@ export async function requireAdmin() {
   return session.user;
 }
 
-/** Requires a STUDENT user (admins are sent to their own area). */
+/**
+ * Requires a fully validated STUDENT. Admins are sent to their own area,
+ * students who haven't finished onboarding are routed to complete their
+ * profile, and those still awaiting a teacher's validation see the pending
+ * screen. Only APPROVED students reach the portal itself.
+ */
 export async function requireStudent() {
   const session = await auth();
   if (!session?.user) {
@@ -35,6 +40,12 @@ export async function requireStudent() {
   }
   if (session.user.role === "ADMIN") {
     redirect("/admin");
+  }
+  if (!session.user.profileCompleted) {
+    redirect("/onboarding");
+  }
+  if (session.user.status !== "APPROVED") {
+    redirect("/pending");
   }
   return session.user;
 }

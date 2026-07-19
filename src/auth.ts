@@ -18,21 +18,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async session({ session, user }) {
       if (session.user) {
+        const dbUser = user as {
+          role?: string;
+          status?: string;
+          profileCompleted?: boolean;
+          phone?: string | null;
+        };
         session.user.id = user.id;
-        // `role` and `phone` live on our extended User model.
-        session.user.role = (user as { role?: string }).role ?? "STUDENT";
-        session.user.phone = (user as { phone?: string | null }).phone ?? null;
+        // `role`, `status`, `profileCompleted` and `phone` live on our
+        // extended User model. With the database session strategy these are
+        // read fresh from Neon on every request, so a teacher's approval takes
+        // effect on the student's very next page load.
+        session.user.role = dbUser.role ?? "STUDENT";
+        session.user.status = dbUser.status ?? "PENDING";
+        session.user.profileCompleted = dbUser.profileCompleted ?? false;
+        session.user.phone = dbUser.phone ?? null;
       }
       return session;
     },
   },
   events: {
     // Promote configured emails to ADMIN the first time they sign up.
+    // Admins (teachers) skip the student validation flow entirely.
     async createUser({ user }) {
       if (user.email && adminEmails.includes(user.email.toLowerCase())) {
         await prisma.user.update({
           where: { id: user.id },
-          data: { role: "ADMIN" },
+          data: { role: "ADMIN", status: "APPROVED", profileCompleted: true },
         });
       }
     },
@@ -45,7 +57,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       ) {
         await prisma.user.update({
           where: { id: user.id },
-          data: { role: "ADMIN" },
+          data: { role: "ADMIN", status: "APPROVED", profileCompleted: true },
         });
       }
     },

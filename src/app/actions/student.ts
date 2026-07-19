@@ -19,6 +19,26 @@ export async function requestEnrollment(classroomId: string) {
   revalidatePath("/classrooms");
 }
 
+/**
+ * Onboarding step for a brand-new (unverified) student. Captures their name
+ * and phone, marks the profile complete, and hands them off to the "pending
+ * validation" screen where they wait for a teacher's approval.
+ */
+export async function completeProfile(formData: FormData) {
+  const user = await requireUser();
+  const name = String(formData.get("name") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+  if (!name) throw new Error("Your name is required");
+  if (!phone) throw new Error("A phone number is required");
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { name, phone, profileCompleted: true },
+  });
+  revalidatePath("/pending");
+  redirect("/pending");
+}
+
 export async function updateProfile(formData: FormData) {
   const user = await requireUser();
   const name = String(formData.get("name") ?? "").trim();

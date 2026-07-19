@@ -24,6 +24,11 @@ model User {
   image         String?
   phone         String?
   role          String    @default("STUDENT") // STUDENT | ADMIN
+  // Account-level validation lifecycle for students (teachers/admins are
+  // approved implicitly). A new Google user starts unverified and gains
+  // portal access only after a teacher validates them.
+  status           String  @default("PENDING") // PENDING | APPROVED | REJECTED
+  profileCompleted Boolean @default(false)
   createdAt     DateTime  @default(now())
 
   accounts    Account[]

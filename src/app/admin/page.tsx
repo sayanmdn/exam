@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
-import { setEnrollmentStatus } from "@/app/actions/admin";
 import { PageHeader, StatCard } from "@/components/ui";
-import { SubmitButton } from "@/components/submit-button";
 
 export default async function AdminDashboard() {
   await requireAdmin();
@@ -18,9 +16,9 @@ export default async function AdminDashboard() {
     prisma.user.count({ where: { role: "STUDENT" } }),
     prisma.classroom.count(),
     prisma.exam.count({ where: { isPublished: true } }),
-    prisma.enrollment.findMany({
-      where: { status: "PENDING" },
-      include: { user: true, classroom: true },
+    // Students who completed onboarding and await teacher validation.
+    prisma.user.findMany({
+      where: { role: "STUDENT", status: "PENDING", profileCompleted: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.attempt.findMany({
@@ -43,7 +41,7 @@ export default async function AdminDashboard() {
         <StatCard label="Classrooms" value={classroomCount} tone="gray" />
         <StatCard label="Active exams" value={activeExams} tone="green" />
         <StatCard
-          label="Pending approvals"
+          label="Pending validations"
           value={pending.length}
           tone="amber"
         />
@@ -54,7 +52,7 @@ export default async function AdminDashboard() {
         <div className="card p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
-              Waiting for approval
+              Waiting for validation
             </h2>
             <Link
               href="/admin/students"
@@ -66,47 +64,29 @@ export default async function AdminDashboard() {
 
           {pending.length === 0 ? (
             <p className="mt-4 text-sm text-gray-500">
-              No pending requests. You&apos;re all caught up. 🎉
+              No students awaiting validation. You&apos;re all caught up. 🎉
             </p>
           ) : (
             <ul className="mt-4 space-y-3">
-              {pending.slice(0, 5).map((e) => (
+              {pending.slice(0, 5).map((s) => (
                 <li
-                  key={e.id}
+                  key={s.id}
                   className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 p-3"
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-gray-900">
-                      {e.user.name ?? e.user.email}
+                      {s.name ?? s.email}
                     </p>
                     <p className="truncate text-xs text-gray-500">
-                      wants to join {e.classroom.name}
+                      {s.email}
                     </p>
                   </div>
-                  <div className="flex gap-2">
-                    <form
-                      action={setEnrollmentStatus.bind(
-                        null,
-                        e.id,
-                        "APPROVED",
-                      )}
-                    >
-                      <SubmitButton className="rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700">
-                        Approve
-                      </SubmitButton>
-                    </form>
-                    <form
-                      action={setEnrollmentStatus.bind(
-                        null,
-                        e.id,
-                        "REJECTED",
-                      )}
-                    >
-                      <SubmitButton className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">
-                        Reject
-                      </SubmitButton>
-                    </form>
-                  </div>
+                  <Link
+                    href="/admin/students"
+                    className="shrink-0 rounded-md bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-700"
+                  >
+                    Review &amp; approve
+                  </Link>
                 </li>
               ))}
             </ul>
