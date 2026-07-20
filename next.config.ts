@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   experimental: {
-    // Allow question-paper PDF uploads through Server Actions (default is 1MB).
-    // Note: Vercel still caps serverless request bodies at ~4.5MB.
+    // Headroom for Server Action payloads (default is 1MB). PDF papers upload
+    // directly to R2 via presigned URLs, so they don't count against this.
     serverActions: { bodySizeLimit: "5mb" },
   },
   images: {

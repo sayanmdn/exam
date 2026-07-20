@@ -4,6 +4,7 @@ import {
   GetObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // Cloudflare R2 is S3-compatible. We talk to it with the AWS S3 SDK pointed at
 // the account's R2 endpoint. Credentials come from the environment (.env):
@@ -75,5 +76,26 @@ export async function getFromR2(key: string): Promise<Uint8Array> {
 export async function deleteFromR2(key: string) {
   await r2().send(
     new DeleteObjectCommand({ Bucket: R2_BUCKET, Key: key }),
+  );
+}
+
+/**
+ * Presigns a PUT URL so the browser can upload a file straight to R2, bypassing
+ * the app's serverless request-body limit. The client must send the same
+ * Content-Type it was signed with.
+ */
+export async function presignPutUrl(
+  key: string,
+  contentType: string,
+  expiresIn = 600,
+) {
+  return getSignedUrl(
+    r2(),
+    new PutObjectCommand({
+      Bucket: R2_BUCKET,
+      Key: key,
+      ContentType: contentType,
+    }),
+    { expiresIn },
   );
 }

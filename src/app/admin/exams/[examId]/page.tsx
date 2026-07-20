@@ -8,12 +8,12 @@ import {
   deleteExam,
   toggleExamPublished,
   setExamClassrooms,
-  uploadExamPaper,
   setPaperQuestionCount,
   setAnswerKey,
 } from "@/app/actions/admin";
 import { PageHeader, Badge, StatCard } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
+import { PaperUploader } from "./paper-uploader";
 
 const OPTIONS = ["A", "B", "C", "D"] as const;
 
@@ -211,8 +211,8 @@ function PdfSections({
       <div className="card p-6">
         <h2 className="text-lg font-semibold text-gray-900">Question paper</h2>
         <p className="mt-1 text-sm text-gray-500">
-          Upload the exam as a single PDF (max 4 MB). Students will read it while
-          answering.
+          Upload the exam as a single PDF (max 25 MB). Students will read it
+          while answering.
         </p>
 
         {paper ? (
@@ -241,24 +241,7 @@ function PdfSections({
           </p>
         )}
 
-        <form
-          action={uploadExamPaper.bind(null, examId)}
-          className="mt-4 flex flex-wrap items-center gap-3"
-        >
-          <input
-            type="file"
-            name="file"
-            accept="application/pdf"
-            required
-            className="text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100"
-          />
-          <SubmitButton
-            pendingText="Uploading…"
-            className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700"
-          >
-            {paper ? "Replace paper" : "Upload paper"}
-          </SubmitButton>
-        </form>
+        <PaperUploader examId={examId} hasPaper={Boolean(paper)} />
       </div>
 
       {/* Number of questions */}

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-helpers";
-import { uploadToR2, deleteFromR2, examPaperKey } from "@/lib/r2";
+import { deleteFromR2, examPaperKey, presignPutUrl } from "@/lib/r2";
 
 // --------------------------------------------------------------------------
 // Classrooms
@@ -222,35 +222,49 @@ export async function createExam(formData: FormData) {
   redirect(`/admin/exams/${exam.id}`);
 }
 
-/** Uploads (or replaces) the PDF question paper for a PDF-type exam. */
-export async function uploadExamPaper(examId: string, formData: FormData) {
+/**
+ * Step 1 of a PDF upload: hand the browser a presigned URL so it can PUT the
+ * file directly to R2 (no serverless body-size limit). Returns the URL + key.
+ */
+export async function createPaperUploadUrl(examId: string, contentType: string) {
   await requireAdmin();
-  const file = formData.get("file");
-  if (!(file instanceof File) || file.size === 0) {
-    throw new Error("Choose a PDF file to upload");
-  }
-  if (file.type !== "application/pdf") {
+  if (contentType !== "application/pdf") {
     throw new Error("The question paper must be a PDF");
   }
-  // The upload passes through the Server Action, so it's bound by Vercel's
-  // ~4.5MB serverless request cap even though it lands in R2.
-  if (file.size > 4 * 1024 * 1024) {
-    throw new Error("PDF is too large — please keep it under 4 MB");
-  }
+  const exam = await prisma.exam.findUnique({
+    where: { id: examId },
+    select: { id: true },
+  });
+  if (!exam) throw new Error("Exam not found");
 
   const key = examPaperKey(examId);
-  const body = Buffer.from(await file.arrayBuffer());
-  await uploadToR2(key, body, file.type);
+  const url = await presignPutUrl(key, contentType);
+  return { url, key };
+}
 
+/**
+ * Step 2 of a PDF upload: once the browser has PUT the file to R2, persist the
+ * object key + metadata against the exam.
+ */
+export async function saveExamPaper(
+  examId: string,
+  meta: { key: string; fileName: string; size: number },
+) {
+  await requireAdmin();
   await prisma.examPaper.upsert({
     where: { examId },
-    update: { key, mimeType: file.type, fileName: file.name, size: file.size },
+    update: {
+      key: meta.key,
+      mimeType: "application/pdf",
+      fileName: meta.fileName,
+      size: meta.size,
+    },
     create: {
       examId,
-      key,
-      mimeType: file.type,
-      fileName: file.name,
-      size: file.size,
+      key: meta.key,
+      mimeType: "application/pdf",
+      fileName: meta.fileName,
+      size: meta.size,
     },
   });
   revalidatePath(`/admin/exams/${examId}`);
