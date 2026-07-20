@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { startAttempt } from "@/app/actions/student";
 import { PageHeader, EmptyState } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
+import { StartPdfExam } from "@/components/start-pdf-exam";
 
 export default async function ExamsPage() {
   const user = await requireStudent();
@@ -97,6 +98,14 @@ export default async function ExamsPage() {
                     >
                       Resume test
                     </PendingLink>
+                  ) : exam.type === "PDF" ? (
+                    <StartPdfExam
+                      examId={exam.id}
+                      paperUrl={`/exams/${exam.id}/paper`}
+                      durationMinutes={exam.durationMinutes}
+                      title={exam.title}
+                      retake={!!completed}
+                    />
                   ) : (
                     <form action={startAttempt.bind(null, exam.id)}>
                       <SubmitButton

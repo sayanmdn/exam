@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { submitAttempt } from "@/app/actions/student";
 import { PdfPaper } from "@/components/pdf-paper";
+import { getPreloadedPaper } from "@/lib/paper-cache";
 
 type RunnerQuestion = {
   id: string;
@@ -44,6 +45,11 @@ export function ExamRunner({
   paperUrl?: string;
 }) {
   const router = useRouter();
+  // Prefer the blob preloaded on the exam list (instant, already downloaded);
+  // fall back to the network route for resumes / direct navigation.
+  const [resolvedPaperUrl] = useState(() =>
+    examType === "PDF" ? getPreloadedPaper(examId) ?? paperUrl : undefined,
+  );
   const [current, setCurrent] = useState(0);
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [marked, setMarked] = useState<Set<string>>(new Set());
@@ -179,7 +185,7 @@ export function ExamRunner({
         /* PDF paper on top, OMR-style answer bar at the bottom */
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 bg-gray-300">
-            {paperUrl && <PdfPaper url={paperUrl} />}
+            {resolvedPaperUrl && <PdfPaper url={resolvedPaperUrl} />}
           </div>
 
           <div className="border-t border-gray-200 bg-white p-3 sm:p-4">
