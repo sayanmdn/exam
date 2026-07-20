@@ -1,45 +1,21 @@
-import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import { getFromR2 } from "@/lib/r2";
+import { getAccessiblePaper } from "@/lib/paper-access";
 
 // Streams a PDF exam's question paper. Route handlers don't run layout guards,
-// so access is enforced here: admins always, students only if they're an
-// approved member of one of the exam's classrooms.
+// so access is enforced in getAccessiblePaper.
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ examId: string }> },
 ) {
   const { examId } = await params;
-  const session = await auth();
-  if (!session?.user) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
-  const exam = await prisma.exam.findUnique({
-    where: { id: examId },
-    include: { classrooms: { select: { id: true } }, paper: true },
-  });
-  if (!exam?.paper) {
-    return new Response("Not found", { status: 404 });
-  }
-
-  if (session.user.role !== "ADMIN") {
-    const enrollment = await prisma.enrollment.findFirst({
-      where: {
-        userId: session.user.id,
-        status: "APPROVED",
-        classroomId: { in: exam.classrooms.map((c) => c.id) },
-      },
-      select: { id: true },
-    });
-    if (!enrollment) {
-      return new Response("Forbidden", { status: 403 });
-    }
+  const access = await getAccessiblePaper(examId);
+  if ("error" in access) {
+    return new Response("Denied", { status: access.error });
   }
 
   let bytes: Uint8Array;
   try {
-    bytes = await getFromR2(exam.paper.key);
+    bytes = await getFromR2(access.paper.key);
   } catch {
     return new Response("Paper unavailable", { status: 502 });
   }
@@ -50,9 +26,9 @@ export async function GET(
 
   return new Response(body, {
     headers: {
-      "Content-Type": exam.paper.mimeType,
+      "Content-Type": access.paper.mimeType,
       "Content-Disposition": `inline; filename="${
-        exam.paper.fileName ?? "question-paper.pdf"
+        access.paper.fileName ?? "question-paper.pdf"
       }"`,
       "Cache-Control": "private, no-store",
     },

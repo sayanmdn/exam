@@ -16,13 +16,7 @@ const MAX_CANVAS_AREA = 16_000_000; // iOS/WebKit blanks canvases past ~16M px
 
 type Slot = { n: number; rendered: boolean; rendering: boolean; imgUrl?: string };
 
-export function PdfPaper({
-  url,
-  fallbackHref,
-}: {
-  url: string;
-  fallbackHref?: string;
-}) {
+export function PdfPaper({ url }: { url: string }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -198,23 +192,8 @@ export function PdfPaper({
     };
   }, [url]);
 
-  const openHref = fallbackHref ?? url;
-
   return (
     <div ref={scrollRef} className="relative h-full w-full overflow-y-auto bg-gray-300">
-      {/* Always-available fallback: opens the PDF in the browser's native viewer
-          (works on iOS Safari even when inline rendering has trouble). */}
-      <div className="sticky top-0 z-10 flex justify-end bg-gray-300/90 px-2 py-1.5 backdrop-blur">
-        <a
-          href={openHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-md bg-white/90 px-3 py-1 text-xs font-semibold text-brand-700 shadow-sm ring-1 ring-gray-300"
-        >
-          Open paper ↗
-        </a>
-      </div>
-
       <div ref={listRef} className="mx-auto max-w-3xl p-2 sm:p-4" />
 
       {status === "loading" && (
@@ -226,15 +205,7 @@ export function PdfPaper({
 
       {status === "error" && (
         <div className="flex flex-col items-center gap-3 py-10 text-center text-sm text-gray-700">
-          <p>Couldn&apos;t display the question paper here.</p>
-          <a
-            href={openHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg bg-brand-600 px-4 py-2 font-semibold text-white hover:bg-brand-700"
-          >
-            Open in new tab
-          </a>
+          <p>Couldn&apos;t load the question paper. Please refresh.</p>
         </div>
       )}
     </div>
