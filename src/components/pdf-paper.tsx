@@ -55,15 +55,16 @@ export function PdfPaper({ url }: { url: string }) {
         canvas.style.width = "100%";
         canvas.style.height = "auto";
         canvas.style.display = "block";
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
 
         // Attach to the DOM BEFORE rendering. iOS/WebKit does not reliably
         // allocate a backing store for a detached, zero-layout canvas, so
         // rendering into it first and swapping it in later yields blank pages.
         el.replaceChildren(canvas);
 
-        await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+        // Pass `canvas` only (the recommended PDF.js v5 API). Passing both
+        // `canvas` and `canvasContext` is ambiguous and renders blank on
+        // iOS/WebKit.
+        await page.render({ canvas, viewport }).promise;
         if (cancelled) {
           el.replaceChildren();
           return;
@@ -124,6 +125,11 @@ export function PdfPaper({ url }: { url: string }) {
           { root: scrollRef.current, rootMargin: "1200px 0px" },
         );
         for (const el of slots.keys()) observer.observe(el);
+
+        // Insurance: render the first pages immediately rather than waiting for
+        // the observer's first callback (which can lag on iOS). renderSlot guards
+        // against double-rendering, so this is safe alongside the observer.
+        for (const el of Array.from(slots.keys()).slice(0, 2)) renderSlot(el);
 
         // Re-render at the new width after a rotation / resize.
         let lastWidth = list.clientWidth;
