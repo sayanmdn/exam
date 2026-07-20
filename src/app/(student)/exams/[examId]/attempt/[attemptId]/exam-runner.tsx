@@ -35,6 +35,7 @@ export function ExamRunner({
   secondsRemaining,
   examType = "MANUAL",
   paperUrl,
+  isIOS = false,
 }: {
   attemptId: string;
   examId: string;
@@ -43,6 +44,7 @@ export function ExamRunner({
   secondsRemaining: number;
   examType?: "MANUAL" | "PDF";
   paperUrl?: string;
+  isIOS?: boolean;
 }) {
   const router = useRouter();
   // Prefer the blob preloaded on the exam list (instant, already downloaded);
@@ -185,9 +187,19 @@ export function ExamRunner({
         /* PDF paper on top, OMR-style answer bar at the bottom */
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 bg-gray-300">
-            {resolvedPaperUrl && (
-              <PdfPaper url={resolvedPaperUrl} fallbackHref={paperUrl} />
-            )}
+            {isIOS
+              ? // iOS/WebKit renders PDFs inline in an iframe (canvas comes out blank).
+                paperUrl && (
+                  <iframe
+                    src={paperUrl}
+                    title="Question paper"
+                    className="h-full w-full border-0"
+                  />
+                )
+              : // Android/Chromium: iframe shows a download stub, so rasterize with PDF.js.
+                resolvedPaperUrl && (
+                  <PdfPaper url={resolvedPaperUrl} fallbackHref={paperUrl} />
+                )}
           </div>
 
           <div className="border-t border-gray-200 bg-white p-3 sm:p-4">
