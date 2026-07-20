@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { submitAttempt } from "@/app/actions/student";
+import { PdfPaper } from "@/components/pdf-paper";
 
 type RunnerQuestion = {
   id: string;
@@ -178,13 +179,7 @@ export function ExamRunner({
         /* PDF paper on top, OMR-style answer bar at the bottom */
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 bg-gray-300">
-            {paperUrl && (
-              <iframe
-                src={paperUrl}
-                title="Question paper"
-                className="h-full w-full border-0"
-              />
-            )}
+            {paperUrl && <PdfPaper url={paperUrl} />}
           </div>
 
           <div className="border-t border-gray-200 bg-white p-3 sm:p-4">
