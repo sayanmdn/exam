@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 // released again once they scroll far away.
 const OVERSAMPLE = 2;
 const MAX_CANVAS_WIDTH = 2600; // per-page memory guard (device px)
+const MAX_CANVAS_AREA = 16_000_000; // iOS/WebKit blanks canvases past ~16M px
 
 type Slot = { n: number; rendered: boolean; rendering: boolean };
 
@@ -40,11 +41,13 @@ export function PdfPaper({ url }: { url: string }) {
         const cssWidth = listRef.current?.clientWidth || 800;
         const base = page.getViewport({ scale: 1 });
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const targetWidth = Math.min(
-          cssWidth * dpr * OVERSAMPLE,
-          MAX_CANVAS_WIDTH,
-        );
-        const viewport = page.getViewport({ scale: targetWidth / base.width });
+        let scale =
+          Math.min(cssWidth * dpr * OVERSAMPLE, MAX_CANVAS_WIDTH) / base.width;
+        // iOS/WebKit blanks out canvases whose backing store exceeds ~16M px.
+        if (base.width * base.height * scale * scale > MAX_CANVAS_AREA) {
+          scale = Math.sqrt(MAX_CANVAS_AREA / (base.width * base.height));
+        }
+        const viewport = page.getViewport({ scale });
 
         const canvas = document.createElement("canvas");
         canvas.width = Math.floor(viewport.width);
@@ -55,12 +58,19 @@ export function PdfPaper({ url }: { url: string }) {
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
-        await page.render({ canvas, canvasContext: ctx, viewport }).promise;
-        if (cancelled) return;
+        // Attach to the DOM BEFORE rendering. iOS/WebKit does not reliably
+        // allocate a backing store for a detached, zero-layout canvas, so
+        // rendering into it first and swapping it in later yields blank pages.
         el.replaceChildren(canvas);
+
+        await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+        if (cancelled) {
+          el.replaceChildren();
+          return;
+        }
         info.rendered = true;
       } catch {
-        /* leave the slot blank; a single page failing is non-fatal */
+        el.replaceChildren(); // drop a partial/blank canvas; page failing is non-fatal
       } finally {
         info.rendering = false;
       }
@@ -111,7 +121,7 @@ export function PdfPaper({ url }: { url: string }) {
               else releaseSlot(el);
             }
           },
-          { root: scrollRef.current, rootMargin: "150% 0px" },
+          { root: scrollRef.current, rootMargin: "1200px 0px" },
         );
         for (const el of slots.keys()) observer.observe(el);
 
