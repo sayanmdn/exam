@@ -57,29 +57,38 @@ export function PdfPaper({
         const canvas = document.createElement("canvas");
         canvas.width = Math.floor(viewport.width);
         canvas.height = Math.floor(viewport.height);
+        canvas.style.width = "100%";
+        canvas.style.height = "auto";
+        canvas.style.display = "block";
+
+        // Attach BEFORE rendering: iOS/WebKit does not reliably allocate a
+        // backing store for a detached, zero-layout canvas, so it must be in the
+        // DOM (and laid out) before page.render draws into it.
+        el.replaceChildren(canvas);
 
         await page.render({ canvas, viewport }).promise;
         if (cancelled) return;
 
-        // Convert the raster to an <img>; iOS paints images reliably where it
-        // sometimes refuses to paint a live canvas in a scroll container.
+        // Swap the canvas for an <img>. iOS paints images reliably in a scroll
+        // container where it may skip painting a live canvas. If toBlob fails,
+        // keep the already-rendered canvas rather than blanking the page.
         const blob: Blob | null = await new Promise((resolve) =>
           canvas.toBlob((b) => resolve(b), "image/png"),
         );
-        canvas.width = 0;
-        canvas.height = 0; // free the backing store
         if (cancelled) return;
-        if (!blob) throw new Error("toBlob returned null");
-
-        const imgUrl = URL.createObjectURL(blob);
-        const img = document.createElement("img");
-        img.src = imgUrl;
-        img.decoding = "async";
-        img.style.width = "100%";
-        img.style.height = "auto";
-        img.style.display = "block";
-        el.replaceChildren(img);
-        info.imgUrl = imgUrl;
+        if (blob) {
+          const imgUrl = URL.createObjectURL(blob);
+          const img = document.createElement("img");
+          img.src = imgUrl;
+          img.decoding = "async";
+          img.style.width = "100%";
+          img.style.height = "auto";
+          img.style.display = "block";
+          el.replaceChildren(img);
+          canvas.width = 0;
+          canvas.height = 0; // free the backing store now that the img holds it
+          info.imgUrl = imgUrl;
+        }
         info.rendered = true;
       } catch {
         el.replaceChildren();

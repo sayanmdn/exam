@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { requireStudent } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { ExamRunner } from "./exam-runner";
@@ -54,12 +53,6 @@ export default async function AttemptPage({
 
   const isPdf = attempt.exam.type === "PDF";
 
-  // iOS/WebKit renders PDFs inline in a plain <iframe> but comes out blank with
-  // PDF.js canvas; Android/Chromium is the reverse. Pick the renderer per
-  // platform on the server to avoid a hydration flip.
-  const ua = (await headers()).get("user-agent") ?? "";
-  const isIOS = /iPad|iPhone|iPod/.test(ua);
-
   return (
     <ExamRunner
       attemptId={attempt.id}
@@ -69,7 +62,6 @@ export default async function AttemptPage({
       secondsRemaining={secondsRemaining}
       examType={isPdf ? "PDF" : "MANUAL"}
       paperUrl={isPdf ? `/exams/${examId}/paper` : undefined}
-      isIOS={isIOS}
     />
   );
 }
