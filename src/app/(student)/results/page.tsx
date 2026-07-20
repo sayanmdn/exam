@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { requireStudent } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { PageHeader, EmptyState } from "@/components/ui";
@@ -74,12 +74,12 @@ export default async function ResultsPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <Link
+                        <PendingLink
                           href={`/results/${a.id}`}
                           className="font-medium text-brand-600 hover:underline"
                         >
                           Review
-                        </Link>
+                        </PendingLink>
                       </td>
                     </tr>
                   );

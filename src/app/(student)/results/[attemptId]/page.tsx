@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { redirect } from "next/navigation";
 import { requireStudent } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
@@ -52,12 +52,12 @@ export default async function ResultDetailPage({
   return (
     <div>
       <div className="mb-6">
-        <Link
+        <PendingLink
           href="/results"
           className="text-sm font-medium text-brand-600 hover:underline"
         >
           ← Back to results
-        </Link>
+        </PendingLink>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-gray-900">
           {attempt.exam.title}
         </h1>

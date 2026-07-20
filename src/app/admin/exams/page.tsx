@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { toggleExamPublished } from "@/app/actions/admin";
@@ -23,12 +23,12 @@ export default async function AdminExamsPage() {
         title="Exams"
         subtitle="Build multiple-choice tests, set timers, and publish them to students."
         action={
-          <Link
+          <PendingLink
             href="/admin/exams/new"
             className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
           >
             + New exam
-          </Link>
+          </PendingLink>
         }
       />
 
@@ -57,12 +57,12 @@ export default async function AdminExamsPage() {
                 {exams.map((exam) => (
                   <tr key={exam.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
-                      <Link
+                      <PendingLink
                         href={`/admin/exams/${exam.id}`}
                         className="font-medium text-brand-700 hover:underline"
                       >
                         {exam.title}
-                      </Link>
+                      </PendingLink>
                       {exam.category && (
                         <span className="ml-2 text-xs text-gray-400">
                           {exam.category.name}
@@ -97,12 +97,12 @@ export default async function AdminExamsPage() {
                             {exam.isPublished ? "Hide" : "Publish"}
                           </SubmitButton>
                         </form>
-                        <Link
+                        <PendingLink
                           href={`/admin/exams/${exam.id}`}
                           className="text-xs font-medium text-gray-600 hover:underline"
                         >
                           Edit
-                        </Link>
+                        </PendingLink>
                       </div>
                     </td>
                   </tr>

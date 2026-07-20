@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { requireStudent } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { PageHeader, StatCard, Badge } from "@/components/ui";
@@ -74,19 +74,19 @@ export default async function StudentDashboard() {
             <h2 className="text-lg font-semibold text-gray-900">
               My classrooms
             </h2>
-            <Link
+            <PendingLink
               href="/classrooms"
               className="text-sm font-medium text-brand-600 hover:underline"
             >
               Browse all
-            </Link>
+            </PendingLink>
           </div>
           {enrollments.length === 0 ? (
             <p className="mt-4 text-sm text-gray-500">
               You haven&apos;t joined any classroom yet.{" "}
-              <Link href="/classrooms" className="text-brand-600 underline">
+              <PendingLink href="/classrooms" className="text-brand-600 underline">
                 Find one to join
-              </Link>
+              </PendingLink>
               .
             </p>
           ) : (
@@ -112,12 +112,12 @@ export default async function StudentDashboard() {
             <h2 className="text-lg font-semibold text-gray-900">
               Recent results
             </h2>
-            <Link
+            <PendingLink
               href="/results"
               className="text-sm font-medium text-brand-600 hover:underline"
             >
               View all
-            </Link>
+            </PendingLink>
           </div>
           {attempts.length === 0 ? (
             <p className="mt-4 text-sm text-gray-500">
@@ -127,7 +127,7 @@ export default async function StudentDashboard() {
             <ul className="mt-4 space-y-3">
               {attempts.map((a) => (
                 <li key={a.id}>
-                  <Link
+                  <PendingLink
                     href={`/results/${a.id}`}
                     className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-3 hover:bg-gray-50"
                   >
@@ -137,7 +137,7 @@ export default async function StudentDashboard() {
                     <span className="text-sm font-semibold text-brand-600">
                       {a.score}/{a.totalMarks}
                     </span>
-                  </Link>
+                  </PendingLink>
                 </li>
               ))}
             </ul>

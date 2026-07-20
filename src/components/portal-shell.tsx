@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Logo } from "./logo";
 import { SignOutButton } from "./sign-out-button";
+import { PendingLink } from "./pending-link";
 
 export type NavItem = {
   href: string;
@@ -33,7 +33,7 @@ export function PortalShell({
   const nav = (
     <nav className="flex flex-1 flex-col gap-1">
       {navItems.map((item) => (
-        <Link
+        <PendingLink
           key={item.href}
           href={item.href}
           onClick={() => setOpen(false)}
@@ -45,7 +45,7 @@ export function PortalShell({
         >
           <span className="h-5 w-5">{item.icon}</span>
           {item.label}
-        </Link>
+        </PendingLink>
       ))}
     </nav>
   );

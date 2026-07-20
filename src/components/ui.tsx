@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "./pending-link";
 
 export function PageHeader({
   title,
@@ -90,12 +90,12 @@ export function EmptyState({
       <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
       <p className="mt-2 max-w-sm text-sm text-gray-500">{body}</p>
       {cta && (
-        <Link
+        <PendingLink
           href={cta.href}
           className="mt-6 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
         >
           {cta.label}
-        </Link>
+        </PendingLink>
       )}
     </div>
   );

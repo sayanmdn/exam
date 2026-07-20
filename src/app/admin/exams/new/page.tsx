@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { createExam } from "@/app/actions/admin";
@@ -39,12 +39,12 @@ export default async function NewExamPage() {
   return (
     <div>
       <div className="mb-6">
-        <Link
+        <PendingLink
           href="/admin/exams"
           className="text-sm font-medium text-brand-600 hover:underline"
         >
           ← Back to exams
-        </Link>
+        </PendingLink>
       </div>
       <PageHeader
         title="Create exam"
@@ -148,12 +148,12 @@ export default async function NewExamPage() {
             >
               Create &amp; add questions
             </SubmitButton>
-            <Link
+            <PendingLink
               href="/admin/exams"
               className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50"
             >
               Cancel
-            </Link>
+            </PendingLink>
           </div>
         </form>
       </div>

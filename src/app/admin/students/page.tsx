@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
@@ -191,12 +191,12 @@ export default async function AdminStudentsPage({
             Search
           </button>
           {query && (
-            <Link
+            <PendingLink
               href="/admin/students"
               className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
             >
               Clear
-            </Link>
+            </PendingLink>
           )}
         </form>
       </div>
@@ -229,12 +229,12 @@ export default async function AdminStudentsPage({
                   return (
                     <tr key={s.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
-                        <Link
+                        <PendingLink
                           href={`/admin/students/${s.id}`}
                           className="font-medium text-gray-900 hover:text-brand-700 hover:underline"
                         >
                           {s.name ?? "—"}
-                        </Link>
+                        </PendingLink>
                         <p className="text-xs text-gray-500">{s.email}</p>
                       </td>
                       <td className="px-4 py-3">
@@ -250,12 +250,12 @@ export default async function AdminStudentsPage({
                               .join(", ")}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <Link
+                        <PendingLink
                           href={`/admin/students/${s.id}`}
                           className="text-xs font-medium text-brand-600 hover:underline"
                         >
                           Manage
-                        </Link>
+                        </PendingLink>
                       </td>
                     </tr>
                   );

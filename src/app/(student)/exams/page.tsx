@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { requireStudent } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { startAttempt } from "@/app/actions/student";
@@ -91,12 +91,12 @@ export default async function ExamsPage() {
 
                 <div className="mt-5 flex items-center gap-3">
                   {inProgress ? (
-                    <Link
+                    <PendingLink
                       href={`/exams/${exam.id}/attempt/${inProgress.id}`}
                       className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600"
                     >
                       Resume test
-                    </Link>
+                    </PendingLink>
                   ) : (
                     <form action={startAttempt.bind(null, exam.id)}>
                       <SubmitButton
@@ -109,12 +109,12 @@ export default async function ExamsPage() {
                     </form>
                   )}
                   {completed && (
-                    <Link
+                    <PendingLink
                       href={`/results/${completed.id}`}
                       className="text-sm font-medium text-brand-600 hover:underline"
                     >
                       Last score: {completed.score}/{completed.totalMarks}
-                    </Link>
+                    </PendingLink>
                   )}
                 </div>
               </div>

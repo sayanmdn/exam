@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { PageHeader, StatCard } from "@/components/ui";
@@ -54,12 +54,12 @@ export default async function AdminDashboard() {
             <h2 className="text-lg font-semibold text-gray-900">
               Waiting for validation
             </h2>
-            <Link
+            <PendingLink
               href="/admin/students"
               className="text-sm font-medium text-brand-600 hover:underline"
             >
               Manage all
-            </Link>
+            </PendingLink>
           </div>
 
           {pending.length === 0 ? (
@@ -81,12 +81,12 @@ export default async function AdminDashboard() {
                       {s.email}
                     </p>
                   </div>
-                  <Link
+                  <PendingLink
                     href="/admin/students"
                     className="shrink-0 rounded-md bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-700"
                   >
                     Review &amp; approve
-                  </Link>
+                  </PendingLink>
                 </li>
               ))}
             </ul>
@@ -99,12 +99,12 @@ export default async function AdminDashboard() {
             <h2 className="text-lg font-semibold text-gray-900">
               Recent submissions
             </h2>
-            <Link
+            <PendingLink
               href="/admin/results"
               className="text-sm font-medium text-brand-600 hover:underline"
             >
               View all
-            </Link>
+            </PendingLink>
           </div>
 
           {recentAttempts.length === 0 ? (

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
@@ -37,12 +37,12 @@ export default async function AdminStudentDetailPage({
   return (
     <div>
       <div className="mb-4">
-        <Link
+        <PendingLink
           href="/admin/students"
           className="text-sm font-medium text-brand-600 hover:underline"
         >
           ← Back to students
-        </Link>
+        </PendingLink>
       </div>
 
       <PageHeader
@@ -131,12 +131,12 @@ export default async function AdminStudentDetailPage({
           {classrooms.length === 0 ? (
             <p className="mt-6 text-sm text-amber-600">
               No classrooms yet.{" "}
-              <Link
+              <PendingLink
                 href="/admin/classrooms"
                 className="font-medium underline"
               >
                 Create one first.
-              </Link>
+              </PendingLink>
             </p>
           ) : (
             <form

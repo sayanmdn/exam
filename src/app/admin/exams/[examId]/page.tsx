@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PendingLink } from "@/components/pending-link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
@@ -59,12 +59,12 @@ export default async function ExamDetailPage({
   return (
     <div>
       <div className="mb-6">
-        <Link
+        <PendingLink
           href="/admin/exams"
           className="text-sm font-medium text-brand-600 hover:underline"
         >
           ← Back to exams
-        </Link>
+        </PendingLink>
       </div>
 
       <PageHeader
