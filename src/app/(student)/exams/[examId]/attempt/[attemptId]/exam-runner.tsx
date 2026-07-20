@@ -185,7 +185,9 @@ export function ExamRunner({
         /* PDF paper on top, OMR-style answer bar at the bottom */
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 bg-gray-300">
-            {resolvedPaperUrl && <PdfPaper url={resolvedPaperUrl} />}
+            {resolvedPaperUrl && (
+              <PdfPaper url={resolvedPaperUrl} fallbackHref={paperUrl} />
+            )}
           </div>
 
           <div className="border-t border-gray-200 bg-white p-3 sm:p-4">

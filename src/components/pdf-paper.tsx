@@ -3,20 +3,26 @@
 import { useEffect, useRef, useState } from "react";
 
 // Native <iframe>/<embed> of a PDF does not render inline on Android (it shows a
-// download placeholder), so we rasterize with PDF.js to <canvas>.
+// download placeholder), so we rasterize with PDF.js.
 //
-// Pages are rendered at device-pixel-ratio × OVERSAMPLE so text stays crisp when
-// the user pinch-zooms (a canvas is a fixed bitmap — under-rendering it is what
-// makes zoomed text look fuzzy). To keep that extra resolution from exhausting
-// memory on long papers, pages are rendered lazily as they scroll into view and
-// released again once they scroll far away.
+// Each page is rendered to a canvas and then swapped for an <img>: iOS/WebKit is
+// unreliable about painting large, dynamically-created canvases inside a
+// scrolling container, but it always paints <img> elements. Pages render at
+// device-pixel-ratio × OVERSAMPLE so text stays crisp when pinch-zoomed, and are
+// rendered lazily (with the far ones released) to bound memory on long papers.
 const OVERSAMPLE = 2;
 const MAX_CANVAS_WIDTH = 2600; // per-page memory guard (device px)
 const MAX_CANVAS_AREA = 16_000_000; // iOS/WebKit blanks canvases past ~16M px
 
-type Slot = { n: number; rendered: boolean; rendering: boolean };
+type Slot = { n: number; rendered: boolean; rendering: boolean; imgUrl?: string };
 
-export function PdfPaper({ url }: { url: string }) {
+export function PdfPaper({
+  url,
+  fallbackHref,
+}: {
+  url: string;
+  fallbackHref?: string;
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -43,7 +49,6 @@ export function PdfPaper({ url }: { url: string }) {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         let scale =
           Math.min(cssWidth * dpr * OVERSAMPLE, MAX_CANVAS_WIDTH) / base.width;
-        // iOS/WebKit blanks out canvases whose backing store exceeds ~16M px.
         if (base.width * base.height * scale * scale > MAX_CANVAS_AREA) {
           scale = Math.sqrt(MAX_CANVAS_AREA / (base.width * base.height));
         }
@@ -52,26 +57,32 @@ export function PdfPaper({ url }: { url: string }) {
         const canvas = document.createElement("canvas");
         canvas.width = Math.floor(viewport.width);
         canvas.height = Math.floor(viewport.height);
-        canvas.style.width = "100%";
-        canvas.style.height = "auto";
-        canvas.style.display = "block";
 
-        // Attach to the DOM BEFORE rendering. iOS/WebKit does not reliably
-        // allocate a backing store for a detached, zero-layout canvas, so
-        // rendering into it first and swapping it in later yields blank pages.
-        el.replaceChildren(canvas);
-
-        // Pass `canvas` only (the recommended PDF.js v5 API). Passing both
-        // `canvas` and `canvasContext` is ambiguous and renders blank on
-        // iOS/WebKit.
         await page.render({ canvas, viewport }).promise;
-        if (cancelled) {
-          el.replaceChildren();
-          return;
-        }
+        if (cancelled) return;
+
+        // Convert the raster to an <img>; iOS paints images reliably where it
+        // sometimes refuses to paint a live canvas in a scroll container.
+        const blob: Blob | null = await new Promise((resolve) =>
+          canvas.toBlob((b) => resolve(b), "image/png"),
+        );
+        canvas.width = 0;
+        canvas.height = 0; // free the backing store
+        if (cancelled) return;
+        if (!blob) throw new Error("toBlob returned null");
+
+        const imgUrl = URL.createObjectURL(blob);
+        const img = document.createElement("img");
+        img.src = imgUrl;
+        img.decoding = "async";
+        img.style.width = "100%";
+        img.style.height = "auto";
+        img.style.display = "block";
+        el.replaceChildren(img);
+        info.imgUrl = imgUrl;
         info.rendered = true;
       } catch {
-        el.replaceChildren(); // drop a partial/blank canvas; page failing is non-fatal
+        el.replaceChildren();
       } finally {
         info.rendering = false;
       }
@@ -81,6 +92,14 @@ export function PdfPaper({ url }: { url: string }) {
       const info = slots.get(el);
       if (!info || !info.rendered) return;
       el.replaceChildren();
+      if (info.imgUrl) {
+        try {
+          URL.revokeObjectURL(info.imgUrl);
+        } catch {
+          /* noop */
+        }
+        info.imgUrl = undefined;
+      }
       info.rendered = false;
     }
 
@@ -97,8 +116,8 @@ export function PdfPaper({ url }: { url: string }) {
         doc = await pdfjs.getDocument({ url }).promise;
         if (cancelled) return;
 
-        // Build correctly-sized placeholder slots first so the scrollbar height
-        // is right before any page has rendered.
+        // Build correctly-sized placeholder slots so the scrollbar height is
+        // right before any page has rendered.
         list.replaceChildren();
         for (let n = 1; n <= doc.numPages; n++) {
           const page = await doc.getPage(n);
@@ -127,8 +146,7 @@ export function PdfPaper({ url }: { url: string }) {
         for (const el of slots.keys()) observer.observe(el);
 
         // Insurance: render the first pages immediately rather than waiting for
-        // the observer's first callback (which can lag on iOS). renderSlot guards
-        // against double-rendering, so this is safe alongside the observer.
+        // the observer's first callback (which can lag on iOS).
         for (const el of Array.from(slots.keys()).slice(0, 2)) renderSlot(el);
 
         // Re-render at the new width after a rotation / resize.
@@ -140,7 +158,7 @@ export function PdfPaper({ url }: { url: string }) {
           for (const el of slots.keys()) {
             releaseSlot(el);
             observer.unobserve(el);
-            observer.observe(el); // re-fires intersection → re-renders if visible
+            observer.observe(el);
           }
         });
         resizeObs.observe(list);
@@ -154,6 +172,15 @@ export function PdfPaper({ url }: { url: string }) {
       cancelled = true;
       observer?.disconnect();
       resizeObs?.disconnect();
+      for (const info of slots.values()) {
+        if (info.imgUrl) {
+          try {
+            URL.revokeObjectURL(info.imgUrl);
+          } catch {
+            /* noop */
+          }
+        }
+      }
       try {
         doc?.destroy();
       } catch {
@@ -162,8 +189,23 @@ export function PdfPaper({ url }: { url: string }) {
     };
   }, [url]);
 
+  const openHref = fallbackHref ?? url;
+
   return (
-    <div ref={scrollRef} className="h-full w-full overflow-y-auto bg-gray-300">
+    <div ref={scrollRef} className="relative h-full w-full overflow-y-auto bg-gray-300">
+      {/* Always-available fallback: opens the PDF in the browser's native viewer
+          (works on iOS Safari even when inline rendering has trouble). */}
+      <div className="sticky top-0 z-10 flex justify-end bg-gray-300/90 px-2 py-1.5 backdrop-blur">
+        <a
+          href={openHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-md bg-white/90 px-3 py-1 text-xs font-semibold text-brand-700 shadow-sm ring-1 ring-gray-300"
+        >
+          Open paper ↗
+        </a>
+      </div>
+
       <div ref={listRef} className="mx-auto max-w-3xl p-2 sm:p-4" />
 
       {status === "loading" && (
@@ -177,7 +219,7 @@ export function PdfPaper({ url }: { url: string }) {
         <div className="flex flex-col items-center gap-3 py-10 text-center text-sm text-gray-700">
           <p>Couldn&apos;t display the question paper here.</p>
           <a
-            href={url}
+            href={openHref}
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-lg bg-brand-600 px-4 py-2 font-semibold text-white hover:bg-brand-700"
