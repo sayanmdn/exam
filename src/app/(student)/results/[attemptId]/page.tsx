@@ -33,13 +33,17 @@ export default async function ResultDetailPage({
     attempt.answers.map((a) => [a.questionId, a.selectedOption]),
   );
 
+  const isPdf = attempt.exam.type === "PDF";
+  const isKeyed = (q: { correctOption: string }) =>
+    (OPTIONS as readonly string[]).includes(q.correctOption);
+
   const percentage =
     attempt.totalMarks > 0
       ? Math.round((attempt.score / attempt.totalMarks) * 100)
       : 0;
   const wrong = questions.filter((q) => {
     const sel = answerByQuestion.get(q.id);
-    return sel && sel !== q.correctOption;
+    return isKeyed(q) && sel && sel !== q.correctOption;
   }).length;
   const unanswered = questions.filter(
     (q) => !answerByQuestion.get(q.id),
@@ -81,9 +85,70 @@ export default async function ResultDetailPage({
       </div>
 
       {/* Answer review */}
-      <h2 className="mb-4 mt-10 text-lg font-semibold text-gray-900">
-        Answer review
-      </h2>
+      <div className="mb-4 mt-10 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold text-gray-900">Answer review</h2>
+        {isPdf && (
+          <a
+            href={`/exams/${attempt.examId}/paper`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border border-brand-300 px-4 py-1.5 text-sm font-semibold text-brand-700 hover:bg-brand-50"
+          >
+            View question paper
+          </a>
+        )}
+      </div>
+
+      {isPdf ? (
+        <div className="card divide-y divide-gray-100">
+          {questions.map((q, i) => {
+            const selected = answerByQuestion.get(q.id);
+            const keyed = isKeyed(q);
+            const isCorrect = keyed && selected === q.correctOption;
+            return (
+              <div
+                key={q.id}
+                className="flex flex-wrap items-center gap-x-6 gap-y-1 px-5 py-3 text-sm"
+              >
+                <span className="w-14 font-semibold text-gray-500">
+                  Q{i + 1}
+                </span>
+                <span className="text-gray-700">
+                  Your answer:{" "}
+                  <span className="font-semibold">{selected ?? "—"}</span>
+                </span>
+                {keyed && (
+                  <span className="text-gray-700">
+                    Correct:{" "}
+                    <span className="font-semibold text-green-700">
+                      {q.correctOption}
+                    </span>
+                  </span>
+                )}
+                <span
+                  className={`ml-auto shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                    !keyed
+                      ? "bg-gray-100 text-gray-500"
+                      : !selected
+                        ? "bg-gray-100 text-gray-500"
+                        : isCorrect
+                          ? "bg-green-50 text-green-700"
+                          : "bg-red-50 text-red-700"
+                  }`}
+                >
+                  {!keyed
+                    ? "Not graded"
+                    : !selected
+                      ? "Not answered"
+                      : isCorrect
+                        ? `+${q.marks}`
+                        : `−${q.negativeMarks}`}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
       <div className="space-y-4">
         {questions.map((q, i) => {
           const selected = answerByQuestion.get(q.id);
@@ -147,6 +212,7 @@ export default async function ResultDetailPage({
           );
         })}
       </div>
+      )}
     </div>
   );
 }

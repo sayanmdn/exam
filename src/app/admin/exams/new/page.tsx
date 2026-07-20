@@ -5,6 +5,7 @@ import { createExam } from "@/app/actions/admin";
 import { PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { EmptyState } from "@/components/ui";
+import { ExamTypeFields } from "./exam-type-fields";
 
 export default async function NewExamPage() {
   await requireAdmin();
@@ -114,6 +115,8 @@ export default async function NewExamPage() {
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>
+
+          <ExamTypeFields />
 
           {/* Category is optional; kept simple — first classroom's categories. */}
           <div>

@@ -31,12 +31,16 @@ export function ExamRunner({
   examTitle,
   questions,
   secondsRemaining,
+  examType = "MANUAL",
+  paperUrl,
 }: {
   attemptId: string;
   examId: string;
   examTitle: string;
   questions: RunnerQuestion[];
   secondsRemaining: number;
+  examType?: "MANUAL" | "PDF";
+  paperUrl?: string;
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState(0);
@@ -170,6 +174,103 @@ export function ExamRunner({
         </div>
       </header>
 
+      {examType === "PDF" ? (
+        /* PDF paper on top, OMR-style answer bar at the bottom */
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 bg-gray-300">
+            {paperUrl && (
+              <iframe
+                src={paperUrl}
+                title="Question paper"
+                className="h-full w-full border-0"
+              />
+            )}
+          </div>
+
+          <div className="border-t border-gray-200 bg-white p-3 sm:p-4">
+            <div className="mx-auto max-w-4xl">
+              {/* Question navigation strip */}
+              <div className="mb-3 flex items-center gap-1.5 overflow-x-auto pb-1">
+                {questions.map((qi, i) => (
+                  <button
+                    key={qi.id}
+                    onClick={() => setCurrent(i)}
+                    className={`h-8 w-8 shrink-0 rounded-md text-xs font-semibold ring-offset-1 transition ${paletteState(
+                      qi,
+                    )} ${i === current ? "ring-2 ring-brand-600" : ""}`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-sm font-semibold text-brand-600">
+                  Q{current + 1} / {questions.length}
+                </span>
+                <div className="flex gap-2">
+                  {OPTIONS.map((opt) => {
+                    const selected = responses[q.id] === opt;
+                    return (
+                      <button
+                        key={opt}
+                        onClick={() => select(opt)}
+                        className={`flex h-11 w-11 items-center justify-center rounded-full border text-sm font-bold transition ${
+                          selected
+                            ? "border-brand-600 bg-brand-600 text-white"
+                            : "border-gray-300 text-gray-600 hover:border-brand-400 hover:bg-brand-50"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="ml-auto flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={toggleMark}
+                    className="rounded-lg border border-purple-300 px-3 py-2 text-xs font-medium text-purple-700 hover:bg-purple-50"
+                  >
+                    {marked.has(q.id) ? "Unmark" : "Mark"}
+                  </button>
+                  <button
+                    onClick={clearResponse}
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    disabled={current === 0}
+                    onClick={() => setCurrent((c) => Math.max(0, c - 1))}
+                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 disabled:opacity-40 hover:bg-gray-50"
+                  >
+                    Previous
+                  </button>
+                  {current < questions.length - 1 ? (
+                    <button
+                      onClick={() =>
+                        setCurrent((c) => Math.min(questions.length - 1, c + 1))
+                      }
+                      className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+                    >
+                      Next
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => doSubmit(false)}
+                      disabled={submitting}
+                      className="rounded-lg bg-green-600 px-5 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
+                    >
+                      Submit
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {/* Question panel */}
         <main className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 sm:p-8">
@@ -305,6 +406,7 @@ export function ExamRunner({
           </button>
         </aside>
       </div>
+      )}
     </div>
   );
 }

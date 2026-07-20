@@ -51,6 +51,8 @@ export default async function AttemptPage({
     negativeMarks: q.negativeMarks,
   }));
 
+  const isPdf = attempt.exam.type === "PDF";
+
   return (
     <ExamRunner
       attemptId={attempt.id}
@@ -58,6 +60,8 @@ export default async function AttemptPage({
       examTitle={attempt.exam.title}
       questions={questions}
       secondsRemaining={secondsRemaining}
+      examType={isPdf ? "PDF" : "MANUAL"}
+      paperUrl={isPdf ? `/exams/${examId}/paper` : undefined}
     />
   );
 }

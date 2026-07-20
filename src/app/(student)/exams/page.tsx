@@ -65,6 +65,11 @@ export default async function ExamsPage() {
                       {exam.category ? ` • ${exam.category.name}` : ""}
                     </p>
                   </div>
+                  {exam.type === "PDF" && (
+                    <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
+                      PDF paper
+                    </span>
+                  )}
                 </div>
                 {exam.description && (
                   <p className="mt-2 line-clamp-2 text-sm text-gray-500">

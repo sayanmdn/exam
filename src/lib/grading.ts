@@ -34,13 +34,18 @@ export async function gradeAttempt(
 
   const answerData = questions.map((q) => {
     const selected = responses[q.id] ?? null;
-    totalMarks += q.marks;
-    if (selected) {
-      if (selected === q.correctOption) {
-        score += q.marks;
-        correctCount += 1;
-      } else {
-        score -= q.negativeMarks;
+    // A question with no answer key (e.g. a PDF paper the teacher hasn't keyed
+    // yet) is not graded: it adds nothing to the total and can't be scored.
+    const keyed = ["A", "B", "C", "D"].includes(q.correctOption);
+    if (keyed) {
+      totalMarks += q.marks;
+      if (selected) {
+        if (selected === q.correctOption) {
+          score += q.marks;
+          correctCount += 1;
+        } else {
+          score -= q.negativeMarks;
+        }
       }
     }
     return {

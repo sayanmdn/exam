@@ -117,6 +117,9 @@ model Exam {
   categoryId      String?
   durationMinutes Int      @default(60)
   isPublished     Boolean  @default(false)
+  // MANUAL: questions typed in one by one. PDF: a single uploaded question
+  // paper; students see the PDF and answer on an OMR-style option grid.
+  type            String   @default("MANUAL") // MANUAL | PDF
   createdAt       DateTime @default(now())
 
   // An exam can be made accessible in a set of classrooms (many-to-many).
@@ -124,6 +127,21 @@ model Exam {
   category   Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   questions  Question[]
   attempts   Attempt[]
+  paper      ExamPaper?
+}
+
+// The uploaded question paper for a PDF-type exam. The file itself lives in
+// Cloudflare R2; here we keep only the object key and metadata.
+model ExamPaper {
+  id         String   @id @default(cuid())
+  examId     String   @unique
+  key        String // R2 object key
+  mimeType   String   @default("application/pdf")
+  fileName   String?
+  size       Int      @default(0)
+  uploadedAt DateTime @default(now())
+
+  exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
 }
 
 model Question {
