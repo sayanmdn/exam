@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { submitAttempt } from "@/app/actions/student";
 import { PdfPaper } from "@/components/pdf-paper";
 import { PdfIframes } from "@/components/pdf-iframes";
+import { PaperShield } from "@/components/paper-shield";
 import { getPreloadedPaper } from "@/lib/paper-cache";
 
 type RunnerQuestion = {
@@ -37,6 +38,7 @@ export function ExamRunner({
   examType = "MANUAL",
   paperUrl,
   isIOS = false,
+  studentLabel = "",
 }: {
   attemptId: string;
   examId: string;
@@ -46,6 +48,7 @@ export function ExamRunner({
   examType?: "MANUAL" | "PDF";
   paperUrl?: string;
   isIOS?: boolean;
+  studentLabel?: string;
 }) {
   const router = useRouter();
   // Prefer the blob preloaded on the exam list (instant, already downloaded);
@@ -188,13 +191,15 @@ export function ExamRunner({
         /* PDF paper on top, OMR-style answer bar at the bottom */
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 bg-gray-300">
-            {isIOS ? (
-              // iOS renders PDFs in iframes (one page each), not PDF.js canvas.
-              <PdfIframes examId={examId} />
-            ) : (
-              // Android/Chromium: iframe shows a download stub, so use PDF.js.
-              resolvedPaperUrl && <PdfPaper url={resolvedPaperUrl} />
-            )}
+            <PaperShield label={studentLabel}>
+              {isIOS ? (
+                // iOS renders PDFs in iframes (one page each), not PDF.js canvas.
+                <PdfIframes examId={examId} />
+              ) : (
+                // Android/Chromium: iframe shows a download stub, so use PDF.js.
+                resolvedPaperUrl && <PdfPaper url={resolvedPaperUrl} />
+              )}
+            </PaperShield>
           </div>
 
           <div className="border-t border-gray-200 bg-white p-3 sm:p-4">

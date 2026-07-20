@@ -70,6 +70,7 @@ export default async function AttemptPage({
       examType={isPdf ? "PDF" : "MANUAL"}
       paperUrl={isPdf ? `/exams/${examId}/paper` : undefined}
       isIOS={isIOS}
+      studentLabel={`${user.email ?? user.name ?? user.id} · ${attempt.id.slice(-6)}`}
     />
   );
 }
