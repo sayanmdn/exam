@@ -85,18 +85,8 @@ export default async function ResultDetailPage({
       </div>
 
       {/* Answer review */}
-      <div className="mb-4 mt-10 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-4 mt-10">
         <h2 className="text-lg font-semibold text-gray-900">Answer review</h2>
-        {isPdf && (
-          <a
-            href={`/exams/${attempt.examId}/paper`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg border border-brand-300 px-4 py-1.5 text-sm font-semibold text-brand-700 hover:bg-brand-50"
-          >
-            View question paper
-          </a>
-        )}
       </div>
 
       {isPdf ? (
