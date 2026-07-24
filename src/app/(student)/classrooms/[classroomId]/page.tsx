@@ -47,7 +47,7 @@ export default async function ClassroomExamsPage({
           href="/classrooms"
           className="text-sm font-medium text-brand-600 hover:underline"
         >
-          ← Back to classrooms
+          ← Back to batches
         </PendingLink>
       </div>
 

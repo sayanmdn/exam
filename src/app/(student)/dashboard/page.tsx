@@ -50,7 +50,7 @@ export default async function StudentDashboard() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Approved classrooms"
+          label="Approved batches"
           value={approvedClassroomIds.length}
           tone="green"
         />
@@ -72,7 +72,7 @@ export default async function StudentDashboard() {
         <div className="card p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
-              My classrooms
+              My batches
             </h2>
             <PendingLink
               href="/classrooms"
@@ -83,7 +83,7 @@ export default async function StudentDashboard() {
           </div>
           {enrollments.length === 0 ? (
             <p className="mt-4 text-sm text-gray-500">
-              You haven&apos;t joined any classroom yet.{" "}
+              You haven&apos;t joined any batch yet.{" "}
               <PendingLink href="/classrooms" className="text-brand-600 underline">
                 Find one to join
               </PendingLink>

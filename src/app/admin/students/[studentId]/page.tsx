@@ -47,7 +47,7 @@ export default async function AdminStudentDetailPage({
 
       <PageHeader
         title={student.name ?? "Unnamed student"}
-        subtitle="View the student's details, manage classroom access, and set their account status."
+        subtitle="View the student's details, manage batch access, and set their account status."
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -123,14 +123,14 @@ export default async function AdminStudentDetailPage({
 
         {/* Classroom assignment */}
         <div className="card p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Classrooms</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Batches</h2>
           <p className="mt-1 text-xs text-gray-500">
-            Select the classrooms this student can access exams in.
+            Select the batches this student can access exams in.
           </p>
 
           {classrooms.length === 0 ? (
             <p className="mt-6 text-sm text-amber-600">
-              No classrooms yet.{" "}
+              No batches yet.{" "}
               <PendingLink
                 href="/admin/classrooms"
                 className="font-medium underline"
@@ -172,7 +172,7 @@ export default async function AdminStudentDetailPage({
                   pendingText="Saving…"
                   className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700"
                 >
-                  Save classrooms
+                  Save batches
                 </SubmitButton>
               </div>
             </form>

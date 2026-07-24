@@ -42,7 +42,7 @@ export default async function LoginPage({
 
           <p className="mt-6 text-center text-xs text-gray-500">
             By continuing you agree to our terms of use and privacy policy.
-            Students will need teacher approval to join a classroom.
+            Students will need teacher approval to join a batch.
           </p>
         </div>
 

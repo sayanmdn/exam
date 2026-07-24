@@ -4,7 +4,7 @@ import { Icons } from "@/components/icons";
 
 const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: Icons.dashboard },
-  { href: "/classrooms", label: "Classrooms", icon: Icons.classroom },
+  { href: "/classrooms", label: "Batches", icon: Icons.classroom },
   { href: "/results", label: "My Results", icon: Icons.results },
   { href: "/profile", label: "Profile", icon: Icons.profile },
 ];

@@ -27,14 +27,14 @@ export default async function AdminClassroomsPage() {
   return (
     <div>
       <PageHeader
-        title="Classrooms"
-        subtitle="Create classrooms for different subjects or batches, and organise exams into categories."
+        title="Batches"
+        subtitle="Create batches for different subjects or groups, and organise exams into categories."
       />
 
       {/* Create form */}
       <div className="card mb-8 p-6">
         <h2 className="text-lg font-semibold text-gray-900">
-          Create a classroom
+          Create a batch
         </h2>
         <form
           action={createClassroom}
@@ -73,7 +73,7 @@ export default async function AdminClassroomsPage() {
       {/* List */}
       {classrooms.length === 0 ? (
         <p className="text-sm text-gray-500">
-          No classrooms yet — create your first one above.
+          No batches yet — create your first one above.
         </p>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">

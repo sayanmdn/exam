@@ -114,7 +114,7 @@ export default async function PendingPage() {
                   •
                 </span>
                 <span className="text-gray-400">
-                  Teacher assigns you a classroom &amp; grants exam access
+                  Teacher assigns you a batch &amp; grants exam access
                 </span>
               </li>
             </ol>

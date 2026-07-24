@@ -20,8 +20,8 @@ export default async function NewExamPage() {
       <div>
         <PageHeader title="Create exam" />
         <EmptyState
-          title="Create a classroom first"
-          body="Exams belong to a classroom. Add one before building exams."
+          title="Create a batch first"
+          body="Exams belong to a batch. Add one before building exams."
           cta={{ href: "/admin/classrooms", label: "Go to classrooms" }}
         />
       </div>
@@ -79,10 +79,10 @@ export default async function NewExamPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Classrooms
+              Batches
             </label>
             <p className="mt-1 text-xs text-gray-400">
-              Select every classroom this exam should be accessible in.
+              Select every batch this exam should be accessible in.
             </p>
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               {classrooms.map((c) => (

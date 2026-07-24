@@ -45,7 +45,7 @@ export default async function AdminExamsPage() {
               <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <tr>
                   <th className="px-4 py-3">Exam</th>
-                  <th className="px-4 py-3">Classroom</th>
+                  <th className="px-4 py-3">Batch</th>
                   <th className="px-4 py-3">Duration</th>
                   <th className="px-4 py-3">Questions</th>
                   <th className="px-4 py-3">Attempts</th>

@@ -73,7 +73,7 @@ export default async function ExamDetailPage({
         subtitle={`${
           exam.classrooms.length
             ? exam.classrooms.map((c) => c.name).join(", ")
-            : "No classrooms"
+            : "No batches"
         }${exam.category ? ` • ${exam.category.name}` : ""}`}
         action={
           <div className="flex items-center gap-3">
@@ -138,16 +138,16 @@ export default async function ExamDetailPage({
 
       {/* Classroom access */}
       <div className="card mb-8 p-6">
-        <h2 className="text-lg font-semibold text-gray-900">Classroom access</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Batch access</h2>
         <p className="mt-1 text-sm text-gray-500">
-          Choose the set of classrooms this exam is accessible in. Approved
-          students in any selected classroom can take it once it&apos;s
+          Choose the set of batches this exam is accessible in. Approved
+          students in any selected batch can take it once it&apos;s
           published.
         </p>
 
         {allClassrooms.length === 0 ? (
           <p className="mt-4 text-sm text-gray-500">
-            No classrooms exist yet. Create one first.
+            No batches exist yet. Create one first.
           </p>
         ) : (
           <form action={setExamClassrooms.bind(null, exam.id)} className="mt-4">
@@ -173,7 +173,7 @@ export default async function ExamDetailPage({
                 pendingText="Saving…"
                 className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
               >
-                Save classroom access
+                Save batch access
               </SubmitButton>
             </div>
           </form>

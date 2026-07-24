@@ -54,7 +54,7 @@ export default async function AdminResultsPage() {
                 <tr>
                   <th className="px-4 py-3">Student</th>
                   <th className="px-4 py-3">Exam</th>
-                  <th className="px-4 py-3">Classroom</th>
+                  <th className="px-4 py-3">Batch</th>
                   <th className="px-4 py-3">Submitted</th>
                   <th className="px-4 py-3">Correct</th>
                   <th className="px-4 py-3">Score</th>

@@ -38,7 +38,7 @@ export default async function AdminDashboard() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Registered students" value={studentCount} tone="brand" />
-        <StatCard label="Classrooms" value={classroomCount} tone="gray" />
+        <StatCard label="Batches" value={classroomCount} tone="gray" />
         <StatCard label="Active exams" value={activeExams} tone="green" />
         <StatCard
           label="Pending validations"

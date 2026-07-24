@@ -41,7 +41,7 @@ export default function AboutPage() {
             configurable marking schemes, and a familiar question navigator.
           </li>
           <li>
-            <strong>Classroom control.</strong> Teachers approve who joins,
+            <strong>Batch control.</strong> Teachers approve who joins,
             group exams into categories, and publish or hide them on demand.
           </li>
           <li>

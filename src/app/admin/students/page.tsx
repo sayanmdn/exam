@@ -56,7 +56,7 @@ export default async function AdminStudentsPage({
     <div>
       <PageHeader
         title="Students"
-        subtitle="Validate new students and manage classroom access."
+        subtitle="Validate new students and manage batch access."
       />
 
       {/* Account validation queue */}
@@ -91,11 +91,11 @@ export default async function AdminStudentsPage({
               <form action={approveStudent} className="mt-4">
                 <input type="hidden" name="userId" value={s.id} />
                 <p className="text-xs font-medium text-gray-700">
-                  Assign classroom(s) to grant exam access
+                  Assign batch(es) to grant exam access
                 </p>
                 {classrooms.length === 0 ? (
                   <p className="mt-2 text-xs text-amber-600">
-                    Create a classroom first — you can approve now and assign
+                    Create a batch first — you can approve now and assign
                     later.
                   </p>
                 ) : (
@@ -132,11 +132,11 @@ export default async function AdminStudentsPage({
 
       {/* Classroom join requests (from already-validated students) */}
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-600">
-        Classroom join requests ({pendingEnrollments.length})
+        Batch join requests ({pendingEnrollments.length})
       </h2>
       {pendingEnrollments.length === 0 ? (
         <div className="card mb-8 p-6 text-sm text-gray-500">
-          No pending classroom requests.
+          No pending batch requests.
         </div>
       ) : (
         <div className="card mb-8 divide-y divide-gray-100">
@@ -217,7 +217,7 @@ export default async function AdminStudentsPage({
                 <tr>
                   <th className="px-4 py-3">Student</th>
                   <th className="px-4 py-3">Account</th>
-                  <th className="px-4 py-3">Classrooms</th>
+                  <th className="px-4 py-3">Batches</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>

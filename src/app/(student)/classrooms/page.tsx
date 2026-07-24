@@ -23,14 +23,14 @@ export default async function ClassroomsPage() {
   return (
     <div>
       <PageHeader
-        title="Classrooms"
-        subtitle="Request to join a classroom. A teacher will approve you before you can take its exams."
+        title="Batches"
+        subtitle="Request to join a batch. A teacher will approve you before you can take its exams."
       />
 
       {classrooms.length === 0 ? (
         <EmptyState
-          title="No classrooms yet"
-          body="There are no classrooms available to join right now. Check back later."
+          title="No batches yet"
+          body="There are no batches available to join right now. Check back later."
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

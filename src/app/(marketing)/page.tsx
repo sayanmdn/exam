@@ -24,7 +24,7 @@ const features = [
     icon: <path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />,
   },
   {
-    title: "Classrooms & approval",
+    title: "Batches & approval",
     body: "Teachers create subject classrooms and approve students before they can access exams and materials.",
     icon: <path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4z" />,
   },
@@ -162,7 +162,7 @@ export default function LandingPage() {
             <h3 className="text-xl font-bold text-brand-900">For students</h3>
             <ul className="mt-4 space-y-3 text-sm text-brand-900/80">
               {[
-                "Sign up with Google and request to join your classroom",
+                "Sign up with Google and request to join your batch",
                 "Take timed exams that auto-submit when the clock hits zero",
                 "See your score, accuracy and answer review instantly",
                 "Look back at your full attempt history any time",
@@ -181,7 +181,7 @@ export default function LandingPage() {
             <ul className="mt-4 space-y-3 text-sm text-gray-700">
               {[
                 "A dashboard summarising students, exams and pending approvals",
-                "Create classrooms and approve or reject student requests",
+                "Create batches and approve or reject student requests",
                 "Build MCQ exams with categories, timers and negative marking",
                 "Publish or hide exams and track every student's performance",
               ].map((t) => (
