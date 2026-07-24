@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 const siteName = "Exams Hub — Mock Tests & Exam Preparation";
 const siteDescription =
-  "Exams Hub is a dedicated educational institute providing carefully designed mock tests and practice examinations based on the latest patterns of major competitive and academic exams. Practise like the real exam, perform with confidence.";
+  "Exams Hub is a dedicated educational institute providing carefully designed mock tests and practice examinations based on the latest patterns of major competitive and academic exams. Practice like the real exam, perform with confidence.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(

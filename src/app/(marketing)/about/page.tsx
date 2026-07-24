@@ -25,7 +25,7 @@ export default function AboutPage() {
         <h2 className="text-2xl font-bold text-gray-900">Our mission</h2>
         <p className="mt-3">
           With regular assessments, detailed performance analysis, and
-          exam-focused preparation, Exams Hub helps students practise effectively
+          exam-focused preparation, Exams Hub helps students practice effectively
           and move closer to their academic and career goals. We give students
           an authentic exam experience — a live timer, a question palette,
           negative marking and instant, honest feedback — while giving educators

@@ -10,7 +10,7 @@ export function SiteFooter() {
             <Logo />
             <p className="mt-3 text-sm text-gray-500">
               A dedicated educational institute providing carefully designed
-              mock tests and practice examinations. Practise like the real exam,
+              mock tests and practice examinations. Practice like the real exam,
               perform with confidence.
             </p>
           </div>

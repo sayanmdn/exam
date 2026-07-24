@@ -43,7 +43,7 @@ export default function LandingPage() {
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:py-28">
           <div className="flex flex-col justify-center">
 <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-              Practise Like the Real Exam. <br />
+              Practice Like the Real Exam. <br />
               Perform with Confidence.
             </h1>
             <p className="mt-5 max-w-lg text-lg text-brand-100">
