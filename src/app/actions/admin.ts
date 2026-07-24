@@ -309,32 +309,40 @@ export async function setPaperQuestionCount(examId: string, formData: FormData) 
   revalidatePath(`/admin/exams/${examId}`);
 }
 
-/** Saves the answer key for a PDF exam (option, marks, negativeMarks per question). */
+/** Saves the answer key for a PDF exam (option per question, blank = unkeyed). */
 export async function setAnswerKey(examId: string, formData: FormData) {
   await requireAdmin();
   const questions = await prisma.question.findMany({
     where: { examId },
-    select: { id: true, marks: true, negativeMarks: true },
+    select: { id: true },
   });
 
   await prisma.$transaction(
     questions.map((q) => {
       const raw = String(formData.get(`key-${q.id}`) ?? "");
       const correctOption = ["A", "B", "C", "D"].includes(raw) ? raw : "";
-      const marks = Number(formData.get(`marks-${q.id}`) ?? q.marks);
-      const negativeMarks = Number(formData.get(`neg-${q.id}`) ?? q.negativeMarks);
       return prisma.question.update({
         where: { id: q.id },
-        data: {
-          correctOption,
-          marks: Number.isFinite(marks) ? Math.max(0, marks) : q.marks,
-          negativeMarks: Number.isFinite(negativeMarks)
-            ? Math.max(0, negativeMarks)
-            : q.negativeMarks,
-        },
+        data: { correctOption },
       });
     }),
   );
+  revalidatePath(`/admin/exams/${examId}`);
+}
+
+/** Updates marks and negative marks for every question in the paper at once. */
+export async function setExamMarks(examId: string, formData: FormData) {
+  await requireAdmin();
+  const marks = Number(formData.get("marks") ?? 4);
+  const negativeMarks = Number(formData.get("negativeMarks") ?? 1);
+
+  await prisma.question.updateMany({
+    where: { examId },
+    data: {
+      marks: Number.isFinite(marks) ? Math.max(0, marks) : 4,
+      negativeMarks: Number.isFinite(negativeMarks) ? Math.max(0, negativeMarks) : 1,
+    },
+  });
   revalidatePath(`/admin/exams/${examId}`);
 }
 
