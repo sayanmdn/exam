@@ -42,10 +42,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-brand-700 to-brand-900 text-white">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:py-28">
           <div className="flex flex-col justify-center">
-            <span className="mb-4 inline-flex w-fit items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-100 ring-1 ring-white/20">
-              Mock tests &bull; Competitive exams &bull; Academic prep
-            </span>
-            <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+<h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
               Practise Like the Real Exam. <br />
               Perform with Confidence.
             </h1>
