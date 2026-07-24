@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requestEnrollment } from "@/app/actions/student";
 import { PageHeader, Badge, EmptyState } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
+import { PendingLink } from "@/components/pending-link";
 
 export default async function ClassroomsPage() {
   const user = await requireStudent();
@@ -53,9 +54,12 @@ export default async function ClassroomsPage() {
 
                 <div className="mt-4">
                   {status === "APPROVED" ? (
-                    <span className="text-sm font-medium text-green-600">
-                      ✓ You&apos;re enrolled
-                    </span>
+                    <PendingLink
+                      href={`/classrooms/${c.id}`}
+                      className="inline-block w-full rounded-lg bg-brand-600 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-brand-700"
+                    >
+                      View exams
+                    </PendingLink>
                   ) : status === "PENDING" ? (
                     <span className="text-sm font-medium text-amber-600">
                       Awaiting approval…
