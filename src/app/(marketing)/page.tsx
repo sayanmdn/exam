@@ -8,12 +8,7 @@ const features = [
       <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
     ),
   },
-  {
-    title: "Negative marking",
-    body: "Configurable +4 / −1 style marking so your practice scores reflect the actual exam pattern.",
-    icon: <path d="M9 7h6m-6 5h6m-6 5h4M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" />,
-  },
-  {
+{
     title: "Instant results",
     body: "The moment you submit, the test is graded and you see your score, accuracy and a full answer review.",
     icon: <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />,
