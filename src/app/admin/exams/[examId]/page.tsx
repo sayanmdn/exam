@@ -31,7 +31,7 @@ export default async function ExamDetailPage({
       include: {
         classrooms: true,
         category: true,
-        questions: { orderBy: { order: "asc" } },
+        questions: { orderBy: { order: "asc" }, select: { id: true, text: true, optionA: true, optionB: true, optionC: true, optionD: true, correctOption: true, marks: true, negativeMarks: true, order: true } },
         paper: {
           select: { fileName: true, size: true, uploadedAt: true },
         },
@@ -203,7 +203,7 @@ function PdfSections({
 }: {
   examId: string;
   paper: { fileName: string | null; size: number; uploadedAt: Date } | null;
-  questions: { id: string; correctOption: string }[];
+  questions: { id: string; correctOption: string; marks: number; negativeMarks: number }[];
 }) {
   return (
     <div className="space-y-8">
@@ -295,35 +295,66 @@ function PdfSections({
           </p>
         ) : (
           <form action={setAnswerKey.bind(null, examId)} className="mt-4">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-              {questions.map((q, i) => (
-                <label
-                  key={q.id}
-                  className="flex items-center gap-2 rounded-lg border border-gray-200 px-2 py-1.5"
-                >
-                  <span className="w-8 shrink-0 text-xs font-semibold text-gray-500">
-                    Q{i + 1}
-                  </span>
-                  <select
-                    name={`key-${q.id}`}
-                    defaultValue={
-                      OPTIONS.includes(
-                        q.correctOption as (typeof OPTIONS)[number],
-                      )
-                        ? q.correctOption
-                        : ""
-                    }
-                    className="w-full rounded-md border border-gray-300 px-1 py-1 text-sm focus:border-brand-500 focus:outline-none"
-                  >
-                    <option value="">—</option>
-                    {OPTIONS.map((o) => (
-                      <option key={o} value={o}>
-                        {o}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 text-left text-xs font-semibold text-gray-500">
+                    <th className="pb-2 pr-4">Q#</th>
+                    <th className="pb-2 pr-4">Correct answer</th>
+                    <th className="pb-2 pr-4">Marks (+)</th>
+                    <th className="pb-2">Negative (−)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {questions.map((q, i) => (
+                    <tr key={q.id}>
+                      <td className="py-2 pr-4 font-semibold text-gray-500">
+                        Q{i + 1}
+                      </td>
+                      <td className="py-2 pr-4">
+                        <select
+                          name={`key-${q.id}`}
+                          defaultValue={
+                            OPTIONS.includes(
+                              q.correctOption as (typeof OPTIONS)[number],
+                            )
+                              ? q.correctOption
+                              : ""
+                          }
+                          className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none"
+                        >
+                          <option value="">—</option>
+                          {OPTIONS.map((o) => (
+                            <option key={o} value={o}>
+                              {o}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="py-2 pr-4">
+                        <input
+                          name={`marks-${q.id}`}
+                          type="number"
+                          min={0}
+                          step={0.5}
+                          defaultValue={q.marks}
+                          className="w-20 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none"
+                        />
+                      </td>
+                      <td className="py-2">
+                        <input
+                          name={`neg-${q.id}`}
+                          type="number"
+                          min={0}
+                          step={0.5}
+                          defaultValue={q.negativeMarks}
+                          className="w-20 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
             <div className="mt-5">
               <SubmitButton

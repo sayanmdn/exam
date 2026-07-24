@@ -166,7 +166,7 @@ export async function setEnrollmentStatus(
 // uploaded paper; here we only need one row per question to hang the student's
 // selected option and (optionally) an answer key off. "" correctOption means
 // "not keyed yet" — such questions stay ungraded.
-function pdfQuestionRows(count: number) {
+function pdfQuestionRows(count: number, marks = 4, negativeMarks = 1) {
   return Array.from({ length: count }, (_, i) => ({
     text: `Question ${i + 1}`,
     optionA: "A",
@@ -174,6 +174,8 @@ function pdfQuestionRows(count: number) {
     optionC: "C",
     optionD: "D",
     correctOption: "",
+    marks,
+    negativeMarks,
     order: i,
   }));
 }
@@ -190,6 +192,8 @@ export async function createExam(formData: FormData) {
   const durationMinutes = Number(formData.get("durationMinutes") ?? 60);
   const type = formData.get("type") === "PDF" ? "PDF" : "MANUAL";
   const numberOfQuestions = Number(formData.get("numberOfQuestions") ?? 0);
+  const marks = Number(formData.get("marks") ?? 4);
+  const negativeMarks = Number(formData.get("negativeMarks") ?? 1);
 
   if (!title) throw new Error("Title is required");
   if (classroomIds.length === 0) {
@@ -198,6 +202,9 @@ export async function createExam(formData: FormData) {
   if (type === "PDF" && (!Number.isFinite(numberOfQuestions) || numberOfQuestions < 1)) {
     throw new Error("Enter how many questions the paper has");
   }
+
+  const safeMarks = Number.isFinite(marks) ? Math.max(0, marks) : 4;
+  const safeNegative = Number.isFinite(negativeMarks) ? Math.max(0, negativeMarks) : 1;
 
   const exam = await prisma.exam.create({
     data: {
@@ -212,7 +219,11 @@ export async function createExam(formData: FormData) {
       ...(type === "PDF"
         ? {
             questions: {
-              create: pdfQuestionRows(Math.min(numberOfQuestions, 200)),
+              create: pdfQuestionRows(
+                Math.min(numberOfQuestions, 200),
+                safeMarks,
+                safeNegative,
+              ),
             },
           }
         : {}),
@@ -279,15 +290,18 @@ export async function setPaperQuestionCount(examId: string, formData: FormData) 
   const existing = await prisma.question.findMany({
     where: { examId },
     orderBy: { order: "asc" },
-    select: { id: true },
+    select: { id: true, marks: true, negativeMarks: true },
   });
+
+  const marks = existing[0]?.marks ?? 4;
+  const negativeMarks = existing[0]?.negativeMarks ?? 1;
 
   if (count < existing.length) {
     const remove = existing.slice(count).map((q) => q.id);
     await prisma.question.deleteMany({ where: { id: { in: remove } } });
   } else if (count > existing.length) {
     await prisma.question.createMany({
-      data: pdfQuestionRows(count)
+      data: pdfQuestionRows(count, marks, negativeMarks)
         .slice(existing.length)
         .map((q) => ({ ...q, examId })),
     });
@@ -295,21 +309,29 @@ export async function setPaperQuestionCount(examId: string, formData: FormData) 
   revalidatePath(`/admin/exams/${examId}`);
 }
 
-/** Saves the answer key for a PDF exam (option per question, blank = unkeyed). */
+/** Saves the answer key for a PDF exam (option, marks, negativeMarks per question). */
 export async function setAnswerKey(examId: string, formData: FormData) {
   await requireAdmin();
   const questions = await prisma.question.findMany({
     where: { examId },
-    select: { id: true },
+    select: { id: true, marks: true, negativeMarks: true },
   });
 
   await prisma.$transaction(
     questions.map((q) => {
       const raw = String(formData.get(`key-${q.id}`) ?? "");
       const correctOption = ["A", "B", "C", "D"].includes(raw) ? raw : "";
+      const marks = Number(formData.get(`marks-${q.id}`) ?? q.marks);
+      const negativeMarks = Number(formData.get(`neg-${q.id}`) ?? q.negativeMarks);
       return prisma.question.update({
         where: { id: q.id },
-        data: { correctOption },
+        data: {
+          correctOption,
+          marks: Number.isFinite(marks) ? Math.max(0, marks) : q.marks,
+          negativeMarks: Number.isFinite(negativeMarks)
+            ? Math.max(0, negativeMarks)
+            : q.negativeMarks,
+        },
       });
     }),
   );

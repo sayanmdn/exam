@@ -116,6 +116,45 @@ export default async function NewExamPage() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Marking scheme
+            </label>
+            <p className="mt-1 text-xs text-gray-400">
+              Applied to every question in this exam.
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-3 sm:max-w-sm">
+              <div>
+                <label className="block text-xs font-medium text-gray-600">
+                  Marks for correct
+                </label>
+                <input
+                  name="marks"
+                  type="number"
+                  min={0}
+                  step={0.5}
+                  defaultValue={4}
+                  required
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600">
+                  Negative marks for wrong
+                </label>
+                <input
+                  name="negativeMarks"
+                  type="number"
+                  min={0}
+                  step={0.5}
+                  defaultValue={1}
+                  required
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                />
+              </div>
+            </div>
+          </div>
+
           <ExamTypeFields />
 
           {/* Category is optional; kept simple — first classroom's categories. */}
