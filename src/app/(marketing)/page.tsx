@@ -50,7 +50,7 @@ export default function LandingPage() {
               Perform with Confidence.
             </h1>
             <p className="mt-5 max-w-lg text-lg text-brand-100">
-              Exam Hub is a dedicated educational institute that provides
+              Exams Hub is a dedicated educational institute that provides
               carefully designed mock tests and practice examinations based on
               the latest patterns of major competitive and academic exams. Join
               your classroom, take timed tests with negative marking, and see

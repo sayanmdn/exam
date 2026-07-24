@@ -48,7 +48,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-8 border-t border-gray-100 pt-6 text-sm text-gray-400">
-          © {new Date().getFullYear()} Exam Hub. All rights reserved.
+          © {new Date().getFullYear()} Exams Hub. All rights reserved.
         </div>
       </div>
     </footer>

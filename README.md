@@ -1,4 +1,4 @@
-# Exam Hub — Mock Tests & Exam Preparation
+# Exams Hub — Mock Tests & Exam Preparation
 
 A dedicated educational institute providing carefully designed mock tests and practice examinations based on the latest patterns of major competitive and academic exams. Teachers create virtual classrooms and timed multiple-choice exams; students join classrooms, take auto-submitting timed tests with negative marking, and see instant results.
 

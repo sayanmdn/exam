@@ -10,7 +10,7 @@ import { INDIAN_PHONE_PATTERN, INDIAN_PHONE_TITLE } from "@/lib/phone";
 
 export const metadata: Metadata = {
   title: "Complete your profile",
-  description: "Finish setting up your Exam Hub student account.",
+  description: "Finish setting up your Exams Hub student account.",
 };
 
 export default async function OnboardingPage() {

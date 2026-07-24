@@ -7,7 +7,7 @@ import { SignOutButton } from "@/components/sign-out-button";
 
 export const metadata: Metadata = {
   title: "Awaiting validation",
-  description: "Your Exam Hub account is waiting for teacher approval.",
+  description: "Your Exams Hub account is waiting for teacher approval.",
 };
 
 export default async function PendingPage() {

@@ -4,7 +4,7 @@ import { ContactForm } from "./contact-form";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Get in touch with the Exam Hub team for support, demos or partnership enquiries.",
+    "Get in touch with the Exams Hub team for support, demos or partnership enquiries.",
 };
 
 export default function ContactPage() {
@@ -32,7 +32,7 @@ export default function ContactPage() {
             <div>
               <dt className="font-semibold text-gray-900">Address</dt>
               <dd className="mt-1 text-gray-600">
-                Exam Hub EdTech Pvt. Ltd.
+                Exams Hub EdTech Pvt. Ltd.
                 <br />
                 Bengaluru, India
               </dd>

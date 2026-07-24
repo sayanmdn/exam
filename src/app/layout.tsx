@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteName = "Exam Hub — Mock Tests & Exam Preparation";
+const siteName = "Exams Hub — Mock Tests & Exam Preparation";
 const siteDescription =
-  "Exam Hub is a dedicated educational institute providing carefully designed mock tests and practice examinations based on the latest patterns of major competitive and academic exams. Practise like the real exam, perform with confidence.";
+  "Exams Hub is a dedicated educational institute providing carefully designed mock tests and practice examinations based on the latest patterns of major competitive and academic exams. Practise like the real exam, perform with confidence.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   ),
   title: {
     default: siteName,
-    template: "%s | Exam Hub",
+    template: "%s | Exams Hub",
   },
   description: siteDescription,
   keywords: [

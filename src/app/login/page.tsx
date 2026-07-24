@@ -7,7 +7,7 @@ import { GoogleButton } from "@/components/google-button";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to Exam Hub with your Google account.",
+  description: "Sign in to Exams Hub with your Google account.",
 };
 
 export default async function LoginPage({

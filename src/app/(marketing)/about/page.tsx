@@ -3,17 +3,17 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About us",
   description:
-    "Learn about Exam Hub, a dedicated educational institute providing carefully designed mock tests and practice examinations based on the latest patterns of major competitive and academic exams.",
+    "Learn about Exams Hub, a dedicated educational institute providing carefully designed mock tests and practice examinations based on the latest patterns of major competitive and academic exams.",
 };
 
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
       <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">
-        About Exam Hub
+        About Exams Hub
       </h1>
       <p className="mt-6 text-lg text-gray-600">
-        Exam Hub is a dedicated educational institute that provides carefully
+        Exams Hub is a dedicated educational institute that provides carefully
         designed mock tests and practice examinations based on the latest
         patterns and standards of major competitive and academic exams. Our
         tests closely simulate the actual examination environment, helping
@@ -25,7 +25,7 @@ export default function AboutPage() {
         <h2 className="text-2xl font-bold text-gray-900">Our mission</h2>
         <p className="mt-3">
           With regular assessments, detailed performance analysis, and
-          exam-focused preparation, Exam Hub helps students practise effectively
+          exam-focused preparation, Exams Hub helps students practise effectively
           and move closer to their academic and career goals. We give students
           an authentic exam experience — a live timer, a question palette,
           negative marking and instant, honest feedback — while giving educators
