@@ -1,8 +1,10 @@
 import { PendingLink } from "@/components/pending-link";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { requireStudent } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { StatCard } from "@/components/ui";
+import { PaperView } from "@/components/paper-view";
 
 const OPTIONS = ["A", "B", "C", "D"] as const;
 
@@ -34,6 +36,11 @@ export default async function ResultDetailPage({
   );
 
   const isPdf = attempt.exam.type === "PDF";
+  // Same platform split as the exam-taking page: iOS renders PDFs in iframes,
+  // Android/desktop uses PDF.js. Decide from the User-Agent on the server.
+  const ua = (await headers()).get("user-agent") ?? "";
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const studentLabel = `${user.email ?? user.name ?? user.id} · ${attempt.id.slice(-6)}`;
   const isKeyed = (q: { correctOption: string }) =>
     (OPTIONS as readonly string[]).includes(q.correctOption);
 
@@ -83,6 +90,23 @@ export default async function ResultDetailPage({
         <StatCard label="Wrong" value={wrong} tone="red" />
         <StatCard label="Unanswered" value={unanswered} tone="gray" />
       </div>
+
+      {/* Question paper (view-only, no download) */}
+      {isPdf && (
+        <div className="mt-10">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">
+            Question paper
+          </h2>
+          <div className="h-[80vh] min-h-[480px] overflow-hidden rounded-lg border border-gray-200">
+            <PaperView
+              examId={attempt.examId}
+              paperUrl={`/exams/${attempt.examId}/paper`}
+              isIOS={isIOS}
+              studentLabel={studentLabel}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Answer review */}
       <div className="mb-4 mt-10">
