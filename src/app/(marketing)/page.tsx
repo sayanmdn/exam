@@ -43,16 +43,18 @@ export default function LandingPage() {
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:py-28">
           <div className="flex flex-col justify-center">
             <span className="mb-4 inline-flex w-fit items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-100 ring-1 ring-white/20">
-              NEET • JEE • Competitive exams
+              Mock tests &bull; Competitive exams &bull; Academic prep
             </span>
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-              Practice smarter. <br />
-              Score higher.
+              Practise Like the Real Exam. <br />
+              Perform with Confidence.
             </h1>
             <p className="mt-5 max-w-lg text-lg text-brand-100">
-              NTAPattern is an online exam portal that simulates the real NTA
-              exam style used for JEE &amp; NEET. Join your classroom, take timed
-              tests with negative marking, and see your results instantly.
+              Exam Hub is a dedicated educational institute that provides
+              carefully designed mock tests and practice examinations based on
+              the latest patterns of major competitive and academic exams. Join
+              your classroom, take timed tests with negative marking, and see
+              your results instantly.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link

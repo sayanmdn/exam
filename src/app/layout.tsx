@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteName = "NTAPattern — Online Exam Portal";
+const siteName = "Exam Hub — Mock Tests & Exam Preparation";
 const siteDescription =
-  "NTAPattern gives you a real simulation of the NTA (National Testing Agency) exam style used for JEE & NEET. Take timed multiple-choice tests, get instant results with negative marking, and track your performance.";
+  "Exam Hub is a dedicated educational institute providing carefully designed mock tests and practice examinations based on the latest patterns of major competitive and academic exams. Practise like the real exam, perform with confidence.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -23,16 +23,16 @@ export const metadata: Metadata = {
   ),
   title: {
     default: siteName,
-    template: "%s | NTAPattern",
+    template: "%s | Exam Hub",
   },
   description: siteDescription,
   keywords: [
-    "NEET mock test",
-    "JEE mock test",
+    "mock test",
+    "exam preparation",
     "online exam portal",
     "MCQ test",
     "timed test",
-    "exam preparation",
+    "competitive exam practice",
   ],
   openGraph: {
     title: siteName,

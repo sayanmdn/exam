@@ -19,7 +19,7 @@ export function Logo({ href = "/" }: { href?: string }) {
         </svg>
       </span>
       <span className="text-lg font-bold tracking-tight text-gray-900">
-        NTA<span className="text-brand-600">Pattern</span>
+        Exam<span className="text-brand-600">Hub</span>
       </span>
     </Link>
   );

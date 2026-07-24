@@ -4,7 +4,7 @@ import { ContactForm } from "./contact-form";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Get in touch with the NTAPattern team for support, demos or partnership enquiries.",
+    "Get in touch with the Exam Hub team for support, demos or partnership enquiries.",
 };
 
 export default function ContactPage() {
@@ -23,7 +23,7 @@ export default function ContactPage() {
           <dl className="mt-10 space-y-6 text-sm">
             <div>
               <dt className="font-semibold text-gray-900">Email</dt>
-              <dd className="mt-1 text-gray-600">support@ntapattern.example</dd>
+              <dd className="mt-1 text-gray-600">alaykumarmukherjee@gmail.com</dd>
             </div>
             <div>
               <dt className="font-semibold text-gray-900">Phone</dt>
@@ -32,7 +32,7 @@ export default function ContactPage() {
             <div>
               <dt className="font-semibold text-gray-900">Address</dt>
               <dd className="mt-1 text-gray-600">
-                NTAPattern EdTech Pvt. Ltd.
+                Exam Hub EdTech Pvt. Ltd.
                 <br />
                 Bengaluru, India
               </dd>

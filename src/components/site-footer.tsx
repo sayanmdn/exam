@@ -9,9 +9,9 @@ export function SiteFooter() {
           <div className="max-w-sm">
             <Logo />
             <p className="mt-3 text-sm text-gray-500">
-              An online learning &amp; testing platform for NEET / JEE-style
-              mock exams. Practice, get instant results, and track your
-              progress.
+              A dedicated educational institute providing carefully designed
+              mock tests and practice examinations. Practise like the real exam,
+              perform with confidence.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
@@ -48,7 +48,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-8 border-t border-gray-100 pt-6 text-sm text-gray-400">
-          © {new Date().getFullYear()} NTAPattern. All rights reserved.
+          © {new Date().getFullYear()} Exam Hub. All rights reserved.
         </div>
       </div>
     </footer>

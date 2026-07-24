@@ -1,6 +1,6 @@
-# NTAPattern — Online Exam Portal
+# Exam Hub — Mock Tests & Exam Preparation
 
-An online learning & testing platform that simulates the real exam style of the **National Testing Agency (NTA)** — the body that conducts India's JEE and NEET entrance exams. Teachers create virtual classrooms and timed multiple-choice exams; students join classrooms, take auto-submitting timed tests with negative marking, and see instant results.
+A dedicated educational institute providing carefully designed mock tests and practice examinations based on the latest patterns of major competitive and academic exams. Teachers create virtual classrooms and timed multiple-choice exams; students join classrooms, take auto-submitting timed tests with negative marking, and see instant results.
 
 Built from [`docs/app.md`](docs/app.md).
 

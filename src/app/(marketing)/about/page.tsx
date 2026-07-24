@@ -3,32 +3,33 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About us",
   description:
-    "Learn about NTAPattern, an online exam portal that simulates the NTA exam style used for JEE & NEET, with classroom-based learning.",
+    "Learn about Exam Hub, a dedicated educational institute providing carefully designed mock tests and practice examinations based on the latest patterns of major competitive and academic exams.",
 };
 
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
       <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">
-        About NTAPattern
+        About Exam Hub
       </h1>
       <p className="mt-6 text-lg text-gray-600">
-        NTAPattern is an online learning and testing platform that lets teachers
-        and coaching institutes run virtual classrooms and conduct timed,
-        multiple-choice examinations — built to faithfully simulate the exam
-        style of the National Testing Agency (NTA), which conducts both the JEE
-        and NEET entrance exams.
+        Exam Hub is a dedicated educational institute that provides carefully
+        designed mock tests and practice examinations based on the latest
+        patterns and standards of major competitive and academic exams. Our
+        tests closely simulate the actual examination environment, helping
+        students understand the question format, improve time management,
+        identify their strengths and weaknesses, and build confidence.
       </p>
 
       <div className="prose mt-10 max-w-none text-gray-700">
         <h2 className="text-2xl font-bold text-gray-900">Our mission</h2>
         <p className="mt-3">
-          Preparing for competitive exams is as much about practising under real
-          conditions as it is about learning the material. We built NTAPattern
-          to give students an authentic NTA-style exam experience — a live
-          timer, a question palette, negative marking and instant, honest
-          feedback — while giving educators the tools to organise students and
-          measure progress.
+          With regular assessments, detailed performance analysis, and
+          exam-focused preparation, Exam Hub helps students practise effectively
+          and move closer to their academic and career goals. We give students
+          an authentic exam experience — a live timer, a question palette,
+          negative marking and instant, honest feedback — while giving educators
+          the tools to organise students and measure progress.
         </p>
 
         <h2 className="mt-10 text-2xl font-bold text-gray-900">
