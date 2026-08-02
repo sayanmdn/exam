@@ -7,6 +7,7 @@ import {
 } from "@/app/actions/admin";
 import { PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
+import { CopyInviteLink } from "@/components/copy-invite-link";
 
 export default async function AdminClassroomsPage() {
   await requireAdmin();
@@ -88,14 +89,17 @@ export default async function AdminClassroomsPage() {
                     {c.description || "No description"}
                   </p>
                 </div>
-                <form action={deleteClassroom.bind(null, c.id)}>
-                  <SubmitButton
-                    confirm={`Delete "${c.name}"? This removes its exams, enrollments and results.`}
-                    className="text-xs font-medium text-red-600 hover:underline"
-                  >
-                    Delete
-                  </SubmitButton>
-                </form>
+                <div className="flex shrink-0 items-center gap-2">
+                  <CopyInviteLink classroomId={c.id} />
+                  <form action={deleteClassroom.bind(null, c.id)}>
+                    <SubmitButton
+                      confirm={`Delete "${c.name}"? This removes its exams, enrollments and results.`}
+                      className="text-xs font-medium text-red-600 hover:underline"
+                    >
+                      Delete
+                    </SubmitButton>
+                  </form>
+                </div>
               </div>
 
               <div className="mt-3 flex gap-4 text-xs text-gray-500">

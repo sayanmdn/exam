@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
 const features = [
   {
@@ -30,7 +31,21 @@ const features = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const freeTests = await prisma.exam.findMany({
+    where: { isFreeTest: true, isPublished: true },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      durationMinutes: true,
+      type: true,
+      _count: { select: { questions: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 6,
+  });
+
   return (
     <>
       {/* Hero */}
@@ -189,6 +204,66 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Free sample tests */}
+      {freeTests.length > 0 && (
+        <section className="bg-white">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                Try a free test
+              </h2>
+              <p className="mt-4 text-gray-600">
+                Experience the platform first-hand with these sample exams —
+                no payment required.
+              </p>
+            </div>
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {freeTests.map(
+                (exam: {
+                  id: string;
+                  title: string;
+                  description: string | null;
+                  durationMinutes: number;
+                  type: string;
+                  _count: { questions: number };
+                }) => (
+                  <div
+                    key={exam.id}
+                    className="flex flex-col rounded-2xl border border-gray-200 bg-gray-50 p-6"
+                  >
+                    <div className="mb-2 flex items-start justify-between gap-2">
+                      <h3 className="text-base font-semibold text-gray-900">
+                        {exam.title}
+                      </h3>
+                      {exam.type === "PDF" && (
+                        <span className="shrink-0 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-600">
+                          PDF
+                        </span>
+                      )}
+                    </div>
+                    {exam.description && (
+                      <p className="mb-3 line-clamp-2 text-sm text-gray-500">
+                        {exam.description}
+                      </p>
+                    )}
+                    <div className="mt-auto flex items-center gap-4 pt-3 text-xs text-gray-500">
+                      <span>⏱ {exam.durationMinutes} min</span>
+                      <span>📝 {exam._count.questions} questions</span>
+                    </div>
+                    <Link
+                      href="/login"
+                      className="mt-4 block rounded-lg bg-brand-600 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-brand-700"
+                    >
+                      Start free test
+                    </Link>
+                  </div>
+                ),
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="bg-brand-700">

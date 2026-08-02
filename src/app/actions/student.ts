@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth-helpers";
 import { gradeAttempt } from "@/lib/grading";
@@ -40,6 +41,29 @@ export async function completeProfile(formData: FormData) {
     where: { id: user.id },
     data: { name, phone, profileCompleted: true },
   });
+
+  // If the student arrived via a batch invite link (/join/[classroomId]), they
+  // will have a pendingClassroom cookie. Auto-create a PENDING enrollment so the
+  // teacher sees them associated with the right batch from the start.
+  const cookieStore = await cookies();
+  const pendingClassroom = cookieStore.get("pendingClassroom")?.value;
+  if (pendingClassroom) {
+    const classroom = await prisma.classroom.findUnique({
+      where: { id: pendingClassroom },
+      select: { id: true },
+    });
+    if (classroom) {
+      await prisma.enrollment.upsert({
+        where: {
+          userId_classroomId: { userId: user.id, classroomId: classroom.id },
+        },
+        update: {},
+        create: { userId: user.id, classroomId: classroom.id, status: "PENDING" },
+      });
+    }
+    cookieStore.delete("pendingClassroom");
+  }
+
   revalidatePath("/pending");
   redirect("/pending");
 }

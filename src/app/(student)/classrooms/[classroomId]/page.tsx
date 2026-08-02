@@ -32,6 +32,7 @@ export default async function ClassroomExamsPage({
     include: {
       category: true,
       _count: { select: { questions: true } },
+      questions: { select: { marks: true, correctOption: true } },
       attempts: {
         where: { userId: user.id },
         orderBy: { startedAt: "desc" },
@@ -66,7 +67,11 @@ export default async function ClassroomExamsPage({
           {exams.map((exam) => {
             const inProgress = exam.attempts.find((a) => !a.submittedAt);
             const completed = exam.attempts.find((a) => a.submittedAt);
-            const totalMarks = exam._count.questions * 4;
+            // Sum per-question marks for keyed questions; unkeyed (PDF answer not
+            // set yet) questions show 0 marks so the display stays accurate.
+            const totalMarks = exam.questions
+              .filter((q) => ["A", "B", "C", "D"].includes(q.correctOption))
+              .reduce((s, q) => s + q.marks, 0);
 
             return (
               <div key={exam.id} className="card flex flex-col p-6">

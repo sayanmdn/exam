@@ -393,6 +393,42 @@ export async function toggleExamPublished(examId: string) {
   revalidatePath(`/admin/exams/${examId}`);
 }
 
+/** Updates the title and duration of an exam. */
+export async function updateExam(examId: string, formData: FormData) {
+  await requireAdmin();
+  const title = String(formData.get("title") ?? "").trim();
+  const durationMinutes = Number(formData.get("durationMinutes") ?? 60);
+  if (!title) throw new Error("Title is required");
+  await prisma.exam.update({
+    where: { id: examId },
+    data: {
+      title,
+      durationMinutes: Number.isFinite(durationMinutes)
+        ? Math.max(1, durationMinutes)
+        : 60,
+    },
+  });
+  revalidatePath(`/admin/exams/${examId}`);
+  revalidatePath("/admin/exams");
+}
+
+/** Toggles whether this exam is shown on the public landing page. */
+export async function toggleFreeTest(examId: string) {
+  await requireAdmin();
+  const exam = await prisma.exam.findUnique({
+    where: { id: examId },
+    select: { isFreeTest: true },
+  });
+  if (!exam) throw new Error("Exam not found");
+  await prisma.exam.update({
+    where: { id: examId },
+    data: { isFreeTest: !exam.isFreeTest },
+  });
+  revalidatePath(`/admin/exams/${examId}`);
+  revalidatePath("/admin/exams");
+  revalidatePath("/");
+}
+
 export async function deleteExam(examId: string) {
   await requireAdmin();
   // Remove the R2 object (if any) before the row cascades away.

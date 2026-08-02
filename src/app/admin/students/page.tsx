@@ -34,9 +34,17 @@ export default async function AdminStudentsPage({
   const [pendingStudents, classrooms, enrollments, allStudents] =
     await Promise.all([
       // Students who finished onboarding and await teacher validation.
+      // Include their pending enrollments so we know which batch they applied to
+      // via an invite link.
       prisma.user.findMany({
         where: { role: "STUDENT", status: "PENDING", profileCompleted: true },
         orderBy: { createdAt: "desc" },
+        include: {
+          enrollments: {
+            where: { status: "PENDING" },
+            include: { classroom: true },
+          },
+        },
       }),
       prisma.classroom.findMany({ orderBy: { name: "asc" } }),
       prisma.enrollment.findMany({
@@ -90,31 +98,62 @@ export default async function AdminStudentsPage({
 
               <form action={approveStudent} className="mt-4">
                 <input type="hidden" name="userId" value={s.id} />
-                <p className="text-xs font-medium text-gray-700">
-                  Assign batch(es) to grant exam access
-                </p>
-                {classrooms.length === 0 ? (
-                  <p className="mt-2 text-xs text-amber-600">
-                    Create a batch first — you can approve now and assign
-                    later.
-                  </p>
+                {s.enrollments.length > 0 ? (
+                  // Student came via a batch invite link — only show the
+                  // batch(es) they applied to, pre-checked. No need to pick.
+                  <>
+                    <p className="text-xs font-medium text-gray-700">
+                      Applied batch
+                      {s.enrollments.length > 1 ? "es" : ""}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {s.enrollments.map((e) => (
+                        <label
+                          key={e.classroomId}
+                          className="flex cursor-pointer items-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-800"
+                        >
+                          <input
+                            type="checkbox"
+                            name="classroomIds"
+                            value={e.classroomId}
+                            defaultChecked
+                            className="h-3.5 w-3.5 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                          />
+                          {e.classroom.name}
+                        </label>
+                      ))}
+                    </div>
+                  </>
                 ) : (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {classrooms.map((c) => (
-                      <label
-                        key={c.id}
-                        className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
-                      >
-                        <input
-                          type="checkbox"
-                          name="classroomIds"
-                          value={c.id}
-                          className="h-3.5 w-3.5 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
-                        />
-                        {c.name}
-                      </label>
-                    ))}
-                  </div>
+                  // No invite — show all batches so admin can assign.
+                  <>
+                    <p className="text-xs font-medium text-gray-700">
+                      Assign batch(es) to grant exam access
+                    </p>
+                    {classrooms.length === 0 ? (
+                      <p className="mt-2 text-xs text-amber-600">
+                        Create a batch first — you can approve now and assign
+                        later.
+                      </p>
+                    ) : (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {classrooms.map((c) => (
+                          <label
+                            key={c.id}
+                            className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
+                          >
+                            <input
+                              type="checkbox"
+                              name="classroomIds"
+                              value={c.id}
+                              className="h-3.5 w-3.5 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                            />
+                            {c.name}
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
                 <div className="mt-4">
                   <SubmitButton

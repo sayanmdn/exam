@@ -7,10 +7,12 @@ import {
   deleteQuestion,
   deleteExam,
   toggleExamPublished,
+  toggleFreeTest,
   setExamClassrooms,
   setPaperQuestionCount,
   setAnswerKey,
   setExamMarks,
+  updateExam,
 } from "@/app/actions/admin";
 import { PageHeader, Badge, StatCard } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
@@ -109,6 +111,60 @@ export default async function ExamDetailPage({
           {exam.description}
         </p>
       )}
+
+      {/* Editable exam settings */}
+      <div className="card mb-8 grid gap-6 p-6 sm:grid-cols-[1fr_auto]">
+        <form action={updateExam.bind(null, exam.id)} className="flex flex-wrap items-end gap-4">
+          <div className="min-w-[200px] flex-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Exam title
+            </label>
+            <input
+              name="title"
+              required
+              defaultValue={exam.title}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            />
+          </div>
+          <div className="w-36">
+            <label className="block text-sm font-medium text-gray-700">
+              Duration (min)
+            </label>
+            <input
+              name="durationMinutes"
+              type="number"
+              min={1}
+              defaultValue={exam.durationMinutes}
+              required
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            />
+          </div>
+          <SubmitButton
+            pendingText="Saving…"
+            className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+          >
+            Save
+          </SubmitButton>
+        </form>
+
+        <div className="flex flex-col justify-end gap-1 border-l border-gray-100 pl-6">
+          <p className="text-sm font-medium text-gray-700">Landing page</p>
+          <p className="mb-2 text-xs text-gray-400">
+            Show this exam as a free sample on the public home page.
+          </p>
+          <form action={toggleFreeTest.bind(null, exam.id)}>
+            <SubmitButton
+              className={`rounded-lg border px-4 py-2 text-sm font-semibold ${
+                exam.isFreeTest
+                  ? "border-green-300 bg-green-50 text-green-700 hover:bg-green-100"
+                  : "border-gray-300 text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              {exam.isFreeTest ? "✓ Free test (on)" : "Mark as free test"}
+            </SubmitButton>
+          </form>
+        </div>
+      </div>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-4">
         <StatCard label="Questions" value={exam.questions.length} tone="brand" />

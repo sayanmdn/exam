@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Exam" ADD COLUMN "isFreeTest" BOOLEAN NOT NULL DEFAULT false;

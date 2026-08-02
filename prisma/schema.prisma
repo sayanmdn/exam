@@ -117,6 +117,8 @@ model Exam {
   categoryId      String?
   durationMinutes Int      @default(60)
   isPublished     Boolean  @default(false)
+  // When true, this exam is shown on the public landing page as a sample.
+  isFreeTest      Boolean  @default(false)
   // MANUAL: questions typed in one by one. PDF: a single uploaded question
   // paper; students see the PDF and answer on an OMR-style option grid.
   type            String   @default("MANUAL") // MANUAL | PDF
