@@ -1,7 +1,7 @@
 import { PendingLink } from "@/components/pending-link";
 import { requireAdmin } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
-import { toggleExamPublished } from "@/app/actions/admin";
+import { toggleExamPublished, toggleFreeTest } from "@/app/actions/admin";
 import { PageHeader, Badge, EmptyState } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 
@@ -168,6 +168,17 @@ function ExamTable({ exams }: { exams: ExamRow[] }) {
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-3">
+                    <form action={toggleFreeTest.bind(null, exam.id)}>
+                      <SubmitButton
+                        className={`text-xs font-medium hover:underline ${
+                          exam.isFreeTest
+                            ? "text-green-600"
+                            : "text-gray-400 hover:text-gray-600"
+                        }`}
+                      >
+                        {exam.isFreeTest ? "★ Free" : "Free?"}
+                      </SubmitButton>
+                    </form>
                     <form action={toggleExamPublished.bind(null, exam.id)}>
                       <SubmitButton className="text-xs font-medium text-brand-600 hover:underline">
                         {exam.isPublished ? "Hide" : "Publish"}
