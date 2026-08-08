@@ -79,19 +79,26 @@ export async function approveStudent(formData: FormData) {
     .filter(Boolean);
   if (!userId) throw new Error("Missing student");
 
-  await prisma.$transaction(async (tx) => {
-    await tx.user.update({
+  // Batched transaction (see setStudentClassrooms): a per-classroom loop inside
+  // an interactive transaction is unreliable over the Neon PgBouncer pooler.
+  await prisma.$transaction([
+    prisma.user.update({
       where: { id: userId },
       data: { status: "APPROVED" },
-    });
-    for (const classroomId of classroomIds) {
-      await tx.enrollment.upsert({
-        where: { userId_classroomId: { userId, classroomId } },
-        update: { status: "APPROVED" },
-        create: { userId, classroomId, status: "APPROVED" },
-      });
-    }
-  });
+    }),
+    prisma.enrollment.updateMany({
+      where: { userId, classroomId: { in: classroomIds } },
+      data: { status: "APPROVED" },
+    }),
+    prisma.enrollment.createMany({
+      data: classroomIds.map((classroomId) => ({
+        userId,
+        classroomId,
+        status: "APPROVED",
+      })),
+      skipDuplicates: true,
+    }),
+  ]);
 
   revalidatePath("/admin/students");
   revalidatePath("/admin");
@@ -141,25 +148,30 @@ export async function setStudentClassrooms(
     .map((v) => String(v))
     .filter(Boolean);
 
-  const all = await prisma.classroom.findMany({ select: { id: true } });
-
-  await prisma.$transaction(async (tx) => {
-    for (const c of all) {
-      if (classroomIds.includes(c.id)) {
-        await tx.enrollment.upsert({
-          where: {
-            userId_classroomId: { userId: studentId, classroomId: c.id },
-          },
-          update: { status: "APPROVED" },
-          create: { userId: studentId, classroomId: c.id, status: "APPROVED" },
-        });
-      } else {
-        await tx.enrollment.deleteMany({
-          where: { userId: studentId, classroomId: c.id },
-        });
-      }
-    }
-  });
+  // Set-based sync in a single batched transaction. This avoids an interactive
+  // transaction with a per-classroom loop, which is unreliable over the Neon
+  // PgBouncer pooler (connection pinning + the 5s interactive-tx timeout). The
+  // three statements run in order, so approving-then-creating is safe:
+  //   1. drop access to any batch no longer selected,
+  //   2. re-approve already-enrolled selected batches,
+  //   3. create rows for newly selected batches (skipping ones from step 2).
+  await prisma.$transaction([
+    prisma.enrollment.deleteMany({
+      where: { userId: studentId, classroomId: { notIn: classroomIds } },
+    }),
+    prisma.enrollment.updateMany({
+      where: { userId: studentId, classroomId: { in: classroomIds } },
+      data: { status: "APPROVED" },
+    }),
+    prisma.enrollment.createMany({
+      data: classroomIds.map((classroomId) => ({
+        userId: studentId,
+        classroomId,
+        status: "APPROVED",
+      })),
+      skipDuplicates: true,
+    }),
+  ]);
 
   revalidatePath(`/admin/students/${studentId}`);
   revalidatePath("/admin/students");
