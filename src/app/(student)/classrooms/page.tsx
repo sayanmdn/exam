@@ -8,17 +8,41 @@ import { PendingLink } from "@/components/pending-link";
 export default async function ClassroomsPage() {
   const user = await requireStudent();
 
-  const [classrooms, enrollments] = await Promise.all([
+  const [allClassrooms, enrollments] = await Promise.all([
     prisma.classroom.findMany({
       orderBy: { name: "asc" },
       include: { _count: { select: { exams: { where: { isPublished: true } } } } },
     }),
-    prisma.enrollment.findMany({ where: { userId: user.id } }),
+    prisma.enrollment.findMany({
+      where: { userId: user.id },
+      include: { classroom: { select: { class: true } } },
+    }),
   ]);
 
   const statusByClassroom = new Map(
     enrollments.map((e) => [e.classroomId, e.status]),
   );
+
+  // The set of classes this student is already tied to (via any enrollment).
+  // Once a student belongs to a class (e.g. "11"), they should only see other
+  // batches of that same class. Batches with no class set are always visible.
+  const myClasses = new Set(
+    enrollments
+      .map((e) => e.classroom.class)
+      .filter((c): c is string => Boolean(c)),
+  );
+
+  const classrooms =
+    myClasses.size === 0
+      ? allClassrooms
+      : allClassrooms.filter(
+          (c) =>
+            // Keep batches matching one of my classes, batches with no class,
+            // and any batch I'm already enrolled in.
+            !c.class ||
+            myClasses.has(c.class) ||
+            statusByClassroom.has(c.id),
+        );
 
   return (
     <div>

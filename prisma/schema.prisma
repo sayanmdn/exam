@@ -81,6 +81,9 @@ model Classroom {
   id          String   @id @default(cuid())
   name        String
   description String?
+  // Free-text class/grade label, e.g. "11", "11 first semester", "12 even".
+  // Students only see batches whose class matches one they're already in.
+  class       String?
   createdAt   DateTime @default(now())
 
   enrollments Enrollment[]

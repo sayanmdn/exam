@@ -14,10 +14,34 @@ export async function createClassroom(formData: FormData) {
   await requireAdmin();
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const klass = String(formData.get("class") ?? "").trim();
   if (!name) throw new Error("Name is required");
 
   await prisma.classroom.create({
-    data: { name, description: description || null },
+    data: {
+      name,
+      description: description || null,
+      class: klass || null,
+    },
+  });
+  revalidatePath("/admin/classrooms");
+}
+
+/** Updates a batch's name, description and class label. */
+export async function updateClassroom(classroomId: string, formData: FormData) {
+  await requireAdmin();
+  const name = String(formData.get("name") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const klass = String(formData.get("class") ?? "").trim();
+  if (!name) throw new Error("Name is required");
+
+  await prisma.classroom.update({
+    where: { id: classroomId },
+    data: {
+      name,
+      description: description || null,
+      class: klass || null,
+    },
   });
   revalidatePath("/admin/classrooms");
 }

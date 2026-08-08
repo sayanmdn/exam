@@ -8,6 +8,7 @@ import {
 import { PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { CopyInviteLink } from "@/components/copy-invite-link";
+import { EditClassroom } from "@/components/edit-classroom";
 
 export default async function AdminClassroomsPage() {
   await requireAdmin();
@@ -39,7 +40,7 @@ export default async function AdminClassroomsPage() {
         </h2>
         <form
           action={createClassroom}
-          className="mt-4 grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+          className="mt-4 grid gap-4 sm:grid-cols-[1fr_auto_1fr_auto] sm:items-end"
         >
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -49,6 +50,16 @@ export default async function AdminClassroomsPage() {
               name="name"
               required
               placeholder="e.g. NEET Physics 2026"
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            />
+          </div>
+          <div className="sm:w-40">
+            <label className="block text-sm font-medium text-gray-700">
+              Class
+            </label>
+            <input
+              name="class"
+              placeholder="e.g. 11"
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>
@@ -82,9 +93,16 @@ export default async function AdminClassroomsPage() {
             <div key={c.id} className="card p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {c.name}
-                  </h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {c.name}
+                    </h3>
+                    {c.class && (
+                      <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+                        Class {c.class}
+                      </span>
+                    )}
+                  </div>
                   <p className="mt-1 text-sm text-gray-500">
                     {c.description || "No description"}
                   </p>
@@ -100,6 +118,17 @@ export default async function AdminClassroomsPage() {
                     </SubmitButton>
                   </form>
                 </div>
+              </div>
+
+              <div className="mt-2">
+                <EditClassroom
+                  classroom={{
+                    id: c.id,
+                    name: c.name,
+                    description: c.description,
+                    class: c.class,
+                  }}
+                />
               </div>
 
               <div className="mt-3 flex gap-4 text-xs text-gray-500">
