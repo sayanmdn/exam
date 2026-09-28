@@ -158,8 +158,8 @@ model Question {
   optionC       String
   optionD       String
   correctOption String // "A" | "B" | "C" | "D"
-  marks         Int    @default(4) // NEET/JEE: +4 for correct
-  negativeMarks Int    @default(1) // NEET/JEE: -1 for wrong
+  marks         Float  @default(4) // NEET/JEE: +4 for correct
+  negativeMarks Float  @default(1) // NEET/JEE: -1 for wrong (supports fractions, e.g. 1/3, 1/4)
   order         Int    @default(0)
 
   exam    Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)

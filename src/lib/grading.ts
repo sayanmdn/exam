@@ -55,6 +55,11 @@ export async function gradeAttempt(
     };
   });
 
+  // Fractional negative marking (e.g. 1/3, 1/4) accumulates binary floating-point
+  // drift across many questions — round to hundredths before persisting.
+  score = Math.round(score * 100) / 100;
+  totalMarks = Math.round(totalMarks * 100) / 100;
+
   await prisma.$transaction([
     prisma.answer.deleteMany({ where: { attemptId } }),
     prisma.answer.createMany({ data: answerData }),

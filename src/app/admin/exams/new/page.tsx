@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { EmptyState } from "@/components/ui";
 import { ExamTypeFields } from "./exam-type-fields";
+import { NegativeMarksField } from "@/components/negative-marks-field";
 
 export default async function NewExamPage() {
   await requireAdmin();
@@ -138,20 +139,7 @@ export default async function NewExamPage() {
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600">
-                  Negative marks for wrong
-                </label>
-                <input
-                  name="negativeMarks"
-                  type="number"
-                  min={0}
-                  step={0.5}
-                  defaultValue={1}
-                  required
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-                />
-              </div>
+              <NegativeMarksField defaultValue={1} />
             </div>
           </div>
 

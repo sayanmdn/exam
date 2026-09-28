@@ -17,6 +17,8 @@ import {
 import { PageHeader, Badge, StatCard } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { PaperUploader } from "./paper-uploader";
+import { NegativeMarksField } from "@/components/negative-marks-field";
+import { formatMarks } from "@/lib/marking-scheme";
 
 const OPTIONS = ["A", "B", "C", "D"] as const;
 
@@ -170,7 +172,7 @@ export default async function ExamDetailPage({
         <StatCard label="Questions" value={exam.questions.length} tone="brand" />
         <StatCard
           label={isPdf ? "Answer key" : "Total marks"}
-          value={isPdf ? `${keyedCount}/${exam.questions.length}` : totalMarks}
+          value={isPdf ? `${keyedCount}/${exam.questions.length}` : formatMarks(totalMarks)}
           tone="gray"
         />
         <StatCard
@@ -361,20 +363,7 @@ function PdfSections({
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600">
-              Negative marks for wrong
-            </label>
-            <input
-              name="negativeMarks"
-              type="number"
-              min={0}
-              step={0.5}
-              defaultValue={questions[0]?.negativeMarks ?? 1}
-              required
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-            />
-          </div>
+          <NegativeMarksField defaultValue={questions[0]?.negativeMarks ?? 1} />
           <div className="col-span-2">
             <SubmitButton
               pendingText="Saving…"
@@ -516,7 +505,7 @@ function ManualSections({ exam }: { exam: ManualExam }) {
                   })}
                 </ul>
                 <p className="mt-2 text-xs text-gray-400">
-                  +{q.marks} for correct · −{q.negativeMarks} for wrong
+                  +{formatMarks(q.marks)} for correct · −{formatMarks(q.negativeMarks)} for wrong
                 </p>
               </div>
             ))}
@@ -585,18 +574,7 @@ function ManualSections({ exam }: { exam: ManualExam }) {
                   className="mt-1 w-full rounded-lg border border-gray-300 px-2 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Negative
-                </label>
-                <input
-                  name="negativeMarks"
-                  type="number"
-                  defaultValue={1}
-                  min={0}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-2 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-                />
-              </div>
+              <NegativeMarksField defaultValue={1} label="Negative" />
             </div>
 
             <SubmitButton

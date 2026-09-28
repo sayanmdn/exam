@@ -5,6 +5,7 @@ import { requireStudent } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { StatCard } from "@/components/ui";
 import { PaperView } from "@/components/paper-view";
+import { formatMarks } from "@/lib/marking-scheme";
 
 const OPTIONS = ["A", "B", "C", "D"] as const;
 
@@ -78,7 +79,7 @@ export default async function ResultDetailPage({
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
           label="Score"
-          value={`${attempt.score}/${attempt.totalMarks}`}
+          value={`${formatMarks(attempt.score)}/${formatMarks(attempt.totalMarks)}`}
           tone="brand"
         />
         <StatCard label="Percentage" value={`${percentage}%`} tone="amber" />
@@ -185,8 +186,8 @@ export default async function ResultDetailPage({
                   {!selected
                     ? "Not answered"
                     : isCorrect
-                      ? `+${q.marks}`
-                      : `−${q.negativeMarks}`}
+                      ? `+${formatMarks(q.marks)}`
+                      : `−${formatMarks(q.negativeMarks)}`}
                 </span>
               </div>
 

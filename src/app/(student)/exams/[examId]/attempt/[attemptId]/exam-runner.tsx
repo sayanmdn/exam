@@ -7,6 +7,7 @@ import { PdfPaper } from "@/components/pdf-paper";
 import { PdfIframes } from "@/components/pdf-iframes";
 import { PaperShield } from "@/components/paper-shield";
 import { getPreloadedPaper } from "@/lib/paper-cache";
+import { formatMarks } from "@/lib/marking-scheme";
 
 type RunnerQuestion = {
   id: string;
@@ -295,7 +296,7 @@ export function ExamRunner({
                 Question {current + 1} of {questions.length}
               </span>
               <span className="text-xs text-gray-400">
-                +{q.marks} / −{q.negativeMarks}
+                +{formatMarks(q.marks)} / −{formatMarks(q.negativeMarks)}
               </span>
             </div>
 
