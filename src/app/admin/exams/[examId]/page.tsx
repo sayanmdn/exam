@@ -346,6 +346,7 @@ function PdfSections({
           to disable negative marking.
         </p>
         <form
+          key={`${questions[0]?.marks ?? 4}-${questions[0]?.negativeMarks ?? 1}`}
           action={setExamMarks.bind(null, examId)}
           className="mt-4 grid grid-cols-2 gap-3 sm:max-w-sm"
         >
